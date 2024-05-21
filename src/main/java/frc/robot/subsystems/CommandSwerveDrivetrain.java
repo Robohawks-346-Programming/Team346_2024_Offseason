@@ -60,7 +60,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         CommandScheduler.getInstance().registerSubsystem(this);
-
+        configurePathPlanner();
         autoChooser = AutoBuilder.buildAutoChooser();
         setBrakeMode();
     }
@@ -73,7 +73,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
 
         CommandScheduler.getInstance().registerSubsystem(this);
-
+        configurePathPlanner();
         autoChooser = AutoBuilder.buildAutoChooser();
         setBrakeMode();
     }
@@ -102,6 +102,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
                 this);
         
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        PathPlannerPath traj1 = PathPlannerPath.fromChoreoTrajectory("StageTestBot");
+        PathPlannerPath traj2 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.1");
+        PathPlannerPath traj3 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.2");
     }
 
     public Command getAutoCommand() {
