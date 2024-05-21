@@ -59,6 +59,15 @@ repositories {
     mavenLocal()
 }
 
+spotless {
+  java {
+    eclipse().configFile('eclipse-formatter.xml')
+  }
+}
+
+// Automatically format code on build.
+compileJava.dependsOn 'spotlessApply'
+
 configurations.all {
     exclude group: "edu.wpi.first.wpilibj"
 }

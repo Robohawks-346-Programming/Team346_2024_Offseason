@@ -16,31 +16,30 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
 
-  CommandSwerveDrivetrain drivetrain;
-  DriverControllerXbox m_driverControls;
-  
+	CommandSwerveDrivetrain drivetrain;
+	DriverControllerXbox m_driverControls;
 
-  public RobotContainer() {
-    configureSubsystems();
-    configureBindings();
-    configureCommands();
-  }
+	public RobotContainer() {
+		configureSubsystems();
+		configureBindings();
+		configureCommands();
+	}
 
-  private void configureBindings() {
-    m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
-  }
+	private void configureBindings() {
+		m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
+	}
 
-  private void configureSubsystems(){
-    drivetrain = DriveConstants.drivetrain;
-  }
+	private void configureSubsystems() {
+		drivetrain = DriveConstants.drivetrain;
+	}
 
-  private void configureCommands() {
-    drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
-        () -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
-        OperatorConstants.DEADZONE));
-  }
+	private void configureCommands() {
+		drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
+				() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
+				OperatorConstants.DEADZONE));
+	}
 
-  public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-  }
+	public Command getAutonomousCommand() {
+		return Commands.print("No autonomous command configured");
+	}
 }
