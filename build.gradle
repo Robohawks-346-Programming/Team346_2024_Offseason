@@ -1,5 +1,6 @@
 plugins {
     id "java"
+	id "com.diffplug.spotless" version "6.24.0"
     id "edu.wpi.first.GradleRIO" version "2024.3.2"
 }
 
@@ -57,6 +58,15 @@ repositories {
     }
     mavenLocal()
 }
+
+spotless {
+  java {
+    eclipse().configFile('eclipse-formatter.xml')
+  }
+}
+
+// Automatically format code on build.
+compileJava.dependsOn 'spotlessApply'
 
 configurations.all {
     exclude group: "edu.wpi.first.wpilibj"

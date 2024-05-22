@@ -39,116 +39,114 @@ import frc.robot.Constants.DriveConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
-
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
-    private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
+	private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
 
-    private final SendableChooser<Command> autoChooser;
+	private final SendableChooser<Command> autoChooser;
 
-    private static final double kSimLoopPeriod = 0.005; // Original: 5 ms
-    private Notifier simNotifier = null;
-    private double lastSimTime;
+	private static final double kSimLoopPeriod = 0.005; // Original: 5 ms
+	private Notifier simNotifier = null;
+	private double lastSimTime;
 
-    public CommandSwerveDrivetrain(
-            SwerveDrivetrainConstants driveTrainConstants,
-            double OdometryUpdateFrequency,
-            SwerveModuleConstants... modules) {
-        super(driveTrainConstants, OdometryUpdateFrequency, modules);
-        if (Constants.currentMode == Constants.Mode.SIM) {
-            startSimThread();
-        }
+	public CommandSwerveDrivetrain(
+			SwerveDrivetrainConstants driveTrainConstants,
+			double OdometryUpdateFrequency,
+			SwerveModuleConstants... modules) {
+		super(driveTrainConstants, OdometryUpdateFrequency, modules);
+		if (Constants.currentMode == Constants.Mode.SIM) {
+			startSimThread();
+		}
 
-        CommandScheduler.getInstance().registerSubsystem(this);
-        configurePathPlanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        setBrakeMode();
-    }
+		CommandScheduler.getInstance().registerSubsystem(this);
+		configurePathPlanner();
+		autoChooser = AutoBuilder.buildAutoChooser();
+		setBrakeMode();
+	}
 
-    public CommandSwerveDrivetrain(
-            SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
-        super(driveTrainConstants, modules);
-        if (Constants.currentMode == Constants.Mode.SIM) {
-            startSimThread();
-        }
+	public CommandSwerveDrivetrain(
+			SwerveDrivetrainConstants driveTrainConstants, SwerveModuleConstants... modules) {
+		super(driveTrainConstants, modules);
+		if (Constants.currentMode == Constants.Mode.SIM) {
+			startSimThread();
+		}
 
-        CommandScheduler.getInstance().registerSubsystem(this);
-        configurePathPlanner();
-        autoChooser = AutoBuilder.buildAutoChooser();
-        setBrakeMode();
-    }
+		CommandScheduler.getInstance().registerSubsystem(this);
+		configurePathPlanner();
+		autoChooser = AutoBuilder.buildAutoChooser();
+		setBrakeMode();
+	}
 
-    public void configurePathPlanner() {
-        double driveBaseRadius = 0;
-        for (var moduleLocation : m_moduleLocations) {
-            driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
-        }
+	public void configurePathPlanner() {
+		double driveBaseRadius = 0;
+		for (var moduleLocation : m_moduleLocations) {
+			driveBaseRadius = Math.max(driveBaseRadius, moduleLocation.getNorm());
+		}
 
-        Pathfinding.setPathfinder(new LocalADStar());
+		Pathfinding.setPathfinder(new LocalADStar());
 
-        AutoBuilder.configureHolonomic(
-            () -> getPose(), 
-            this::seedFieldRelative, 
-            this::getCurrentRobotChassisSpeeds, 
-            (speeds)->this.setControl(AutoRequest.withSpeeds(speeds)), 
-            Constants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG, 
-                () -> {
-                        var alliance = DriverStation.getAlliance();
-                        if (alliance.isPresent()) {
-                            return alliance.get() == DriverStation.Alliance.Red;
-                        }
-                        return false;
-                    },
-                this);
-        
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+		AutoBuilder.configureHolonomic(
+				() -> getPose(),
+				this::seedFieldRelative,
+				this::getCurrentRobotChassisSpeeds,
+				(speeds) -> this.setControl(AutoRequest.withSpeeds(speeds)),
+				Constants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
+				() -> {
+					var alliance = DriverStation.getAlliance();
+					if (alliance.isPresent()) {
+						return alliance.get() == DriverStation.Alliance.Red;
+					}
+					return false;
+				},
+				this);
 
-        PathPlannerPath traj1 = PathPlannerPath.fromChoreoTrajectory("StageTestBot");
-        PathPlannerPath traj2 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.1");
-        PathPlannerPath traj3 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.2");
-    }
+		SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    public Command getAutoCommand() {
-        return autoChooser.getSelected();
-    }
+		PathPlannerPath traj1 = PathPlannerPath.fromChoreoTrajectory("StageTestBot");
+		PathPlannerPath traj2 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.1");
+		PathPlannerPath traj3 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.2");
+	}
 
-    public ChassisSpeeds getCurrentRobotChassisSpeeds() {
-        return m_kinematics.toChassisSpeeds(getState().ModuleStates);
-    }
+	public Command getAutoCommand() {
+		return autoChooser.getSelected();
+	}
 
-    private void startSimThread() {
-        lastSimTime = Utils.getCurrentTimeSeconds();
+	public ChassisSpeeds getCurrentRobotChassisSpeeds() {
+		return m_kinematics.toChassisSpeeds(getState().ModuleStates);
+	}
 
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
-        simNotifier =
-                new Notifier(
-                        () -> {
-                            final double currentTime = Utils.getCurrentTimeSeconds();
-                            double deltaTime = currentTime - lastSimTime;
-                            lastSimTime = currentTime;
+	private void startSimThread() {
+		lastSimTime = Utils.getCurrentTimeSeconds();
 
-                            /* use the measured time delta, get battery voltage from WPILib */
-                            updateSimState(deltaTime, RobotController.getBatteryVoltage());
-                        });
-        simNotifier.startPeriodic(kSimLoopPeriod);
-    }
+		/* Run simulation at a faster rate so PID gains behave more reasonably */
+		simNotifier = new Notifier(
+				() -> {
+					final double currentTime = Utils.getCurrentTimeSeconds();
+					double deltaTime = currentTime - lastSimTime;
+					lastSimTime = currentTime;
 
-    public void setBrakeMode() {
-        for (int i = 0; i < 3; i++){
-            this.getModule(i)
-                    .getDriveMotor()
-                    .setNeutralMode(NeutralModeValue.Brake);
-            this.getModule(i)
-                    .getSteerMotor()
-                    .setNeutralMode(NeutralModeValue.Coast);
-        }
-    }
+					/* use the measured time delta, get battery voltage from WPILib */
+					updateSimState(deltaTime, RobotController.getBatteryVoltage());
+				});
+		simNotifier.startPeriodic(kSimLoopPeriod);
+	}
 
-    public Pose2d getPose() {
-        return this.getState().Pose;
-    }
+	public void setBrakeMode() {
+		for (int i = 0; i < 3; i++) {
+			this.getModule(i)
+					.getDriveMotor()
+					.setNeutralMode(NeutralModeValue.Brake);
+			this.getModule(i)
+					.getSteerMotor()
+					.setNeutralMode(NeutralModeValue.Coast);
+		}
+	}
 
-    public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-        return run(() -> this.setControl(requestSupplier.get()));
-    }
+	public Pose2d getPose() {
+		return this.getState().Pose;
+	}
+
+	public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
+		return run(() -> this.setControl(requestSupplier.get()));
+	}
 }
