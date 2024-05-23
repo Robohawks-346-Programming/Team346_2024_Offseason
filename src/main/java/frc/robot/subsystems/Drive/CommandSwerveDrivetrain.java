@@ -43,7 +43,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
 	private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
 
-	private final SendableChooser<Command> autoChooser;
+	private SendableChooser<Command> autoChooser;
 
 	private static final double kSimLoopPeriod = 0.005; // Original: 5 ms
 	private Notifier simNotifier = null;
@@ -58,10 +58,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 			startSimThread();
 		}
 
-		CommandScheduler.getInstance().registerSubsystem(this);
 		configurePathPlanner();
-		autoChooser = AutoBuilder.buildAutoChooser();
 		setBrakeMode();
+		CommandScheduler.getInstance().registerSubsystem(this);
 	}
 
 	public CommandSwerveDrivetrain(
@@ -71,10 +70,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 			startSimThread();
 		}
 
-		CommandScheduler.getInstance().registerSubsystem(this);
 		configurePathPlanner();
-		autoChooser = AutoBuilder.buildAutoChooser();
 		setBrakeMode();
+		CommandScheduler.getInstance().registerSubsystem(this);
 	}
 
 	public void configurePathPlanner() {
@@ -100,6 +98,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 				},
 				this);
 
+		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData("Auto Chooser", autoChooser);
 
 		PathPlannerPath traj1 = PathPlannerPath.fromChoreoTrajectory("StageTestBot");

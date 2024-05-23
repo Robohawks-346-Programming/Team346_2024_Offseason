@@ -116,7 +116,7 @@ public class Constants {
 
 		private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
 				.withPigeon2Id(0)
-				.withCANbusName("sim");
+				.withCANbusName("rio");
 
 		private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
 				.withDriveMotorGearRatio(DRIVETRAIN_GEAR_RATIO)
