@@ -40,7 +40,7 @@ public class TeleopDrive extends Command {
 		this.zRotation = zRotation;
 		this.deadzone = deadzone;
 		headingTarget = m_drive.getPose().getRotation().getRadians();
-		// addRequirements(drive);
+		addRequirements(drive);
 	}
 
 	@Override

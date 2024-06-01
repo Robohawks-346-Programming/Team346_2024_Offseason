@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -21,7 +24,7 @@ import frc.robot.subsystems.Drive.TelemetryIOSim;
 
 public class RobotContainer {
 
-	CommandSwerveDrivetrain drivetrain = DriveConstants.drivetrain;;
+	CommandSwerveDrivetrain drivetrain = DriveConstants.drivetrain;
 	DriverControllerXbox m_driverControls;
 	Telemetry telemetry;
 
@@ -51,6 +54,9 @@ public class RobotContainer {
 				drivetrain.seedFieldRelative(new Pose2d());
 				break;
 		}
+		drivetrain.registerTelemetry(telemetry::telemeterize);
+		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
+		drivetrain.setVelocitySupplier(telemetry::getVelocity);
 	}
 
 	private void configureCommands() {
@@ -61,5 +67,21 @@ public class RobotContainer {
 
 	public Command getAutonomousCommand() {
 		return Commands.print("No autonomous command configured");
+	}
+
+	public void robotPeriodic() {
+		Logger.recordOutput("localizer/RobotPose", telemetry.getFieldToRobot());
+		Logger.recordOutput(
+				"localizer/RobotVelocity",
+				new Pose2d(
+						telemetry.getFieldToRobot().getX()
+								+ (telemetry.getVelocity().getX()
+										* 0.01),
+						telemetry.getFieldToRobot().getY()
+								+ (telemetry.getVelocity().getY()
+										* 0.01),
+						telemetry.getFieldToRobot().getRotation()));
+
+		telemetry.logDataSynchronously();
 	}
 }

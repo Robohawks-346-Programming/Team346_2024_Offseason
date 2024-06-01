@@ -49,6 +49,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 	private Notifier simNotifier = null;
 	private double lastSimTime;
 
+	private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
+	private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
+
 	public CommandSwerveDrivetrain(
 			SwerveDrivetrainConstants driveTrainConstants,
 			double OdometryUpdateFrequency,
@@ -147,5 +150,13 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
 	public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
 		return run(() -> this.setControl(requestSupplier.get()));
+	}
+
+	public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
+		this.getFieldToRobot = getFieldToRobot;
+	}
+
+	public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
+		this.getRobotVelocity = getRobotVelocity;
 	}
 }

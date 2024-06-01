@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.hal.HALUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,6 +48,10 @@ public class Robot extends LoggedRobot {
 
 		PathfindingCommand.warmupCommand();
 
+		if (Robot.isSimulation()) {
+			DriverStation.silenceJoystickConnectionWarning(true);
+		}
+
 		m_robotContainer = new RobotContainer();
 	}
 
@@ -54,6 +59,7 @@ public class Robot extends LoggedRobot {
 	public void robotPeriodic() {
 		long start = HALUtil.getFPGATime();
 		CommandScheduler.getInstance().run();
+		m_robotContainer.robotPeriodic();
 		SmartDashboard.putNumber("Loop Cycle Time", (HALUtil.getFPGATime() - start) / 1000);
 	}
 

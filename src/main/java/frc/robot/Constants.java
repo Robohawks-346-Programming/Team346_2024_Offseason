@@ -1,6 +1,8 @@
 package frc.robot;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
@@ -17,13 +19,14 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
 public class Constants {
-	public static final Mode currentMode = Robot.isReal() ? Mode.REAL : Mode.SIM;
-
-	// public static final Mode currentMode = Mode.REPLAY;
 
 	public static enum Mode {
 		REAL, SIM, REPLAY
 	}
+
+	public static final Mode currentMode = Robot.isReal() ? Mode.REAL : Mode.SIM;
+
+	// public static final Mode currentMode = Mode.REPLAY;
 
 	public static final class DriveConstants {
 		public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(20.5);
@@ -169,8 +172,22 @@ public class Constants {
 				Units.inchesToMeters(HALF_WHEELBASE_METERS),
 				BACK_RIGHT_DRIVE_MOTOR_INVERT);
 
+		private static final Translation2d[] wheelLocations = new Translation2d[] {
+				new Translation2d(Units.inchesToMeters(-HALF_TRACKWIDTH_METERS),
+						Units.inchesToMeters(-HALF_WHEELBASE_METERS)),
+				new Translation2d(Units.inchesToMeters(-HALF_TRACKWIDTH_METERS),
+						Units.inchesToMeters(HALF_WHEELBASE_METERS)),
+				new Translation2d(Units.inchesToMeters(HALF_TRACKWIDTH_METERS),
+						Units.inchesToMeters(-HALF_WHEELBASE_METERS)),
+				new Translation2d(Units.inchesToMeters(HALF_TRACKWIDTH_METERS),
+						Units.inchesToMeters(HALF_WHEELBASE_METERS))
+		};
+
 		public static final CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain(
 				DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
+		public static final SimSwerveDrivetrain simDrivetrain = new SimSwerveDrivetrain(wheelLocations, new Pigeon2(0),
+				DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
+
 	}
 
 	public static final class AutoConstants {
