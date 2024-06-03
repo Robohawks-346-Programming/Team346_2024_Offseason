@@ -66,7 +66,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return drivetrain.getAutoCommand();
 	}
 
 	public void robotPeriodic() {

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.Currency;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
@@ -61,8 +62,6 @@ public class TeleopDrive extends Command {
 		Logger.recordOutput("current heading target", headingTarget);
 		Logger.recordOutput("current curZRotation", curZRotation);
 
-		m_drive.applyRequest(() -> drive.withVelocityX(curXSpeed)
-				.withVelocityY(curYSpeed)
-				.withRotationalRate(curZRotation));
+		m_drive.drive(curXSpeed, curYSpeed, curZRotation);
 	}
 }

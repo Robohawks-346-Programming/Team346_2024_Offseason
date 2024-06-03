@@ -42,6 +42,7 @@ import org.littletonrobotics.junction.Logger;
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
 	private final SwerveRequest.ApplyChassisSpeeds AutoRequest = new SwerveRequest.ApplyChassisSpeeds();
+	private SwerveRequest.FieldCentric driveFieldCentric = new SwerveRequest.FieldCentric();
 
 	private SendableChooser<Command> autoChooser;
 
@@ -148,8 +149,14 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 		return this.getState().Pose;
 	}
 
-	public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
-		return run(() -> this.setControl(requestSupplier.get()));
+	public void drive(double vx, double vy, double omega) {
+		setControl(
+				driveFieldCentric
+						.withVelocityX(vx)
+						.withVelocityY(vy)
+						.withRotationalRate(omega)
+						.withDeadband(0.0)
+						.withRotationalDeadband(0.0));
 	}
 
 	public void setPoseSupplier(Supplier<Pose2d> getFieldToRobot) {
