@@ -119,7 +119,7 @@ public class Constants {
 
 		private static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
 				.withPigeon2Id(0)
-				.withCANbusName("rio");
+				.withCANbusName("*");
 
 		private static final SwerveModuleConstantsFactory ConstantCreator = new SwerveModuleConstantsFactory()
 				.withDriveMotorGearRatio(DRIVETRAIN_GEAR_RATIO)
@@ -130,14 +130,14 @@ public class Constants {
 				.withDriveMotorGains(driveGains)
 				.withSteerMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
 				.withDriveMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
-				// .withSpeedAt12VoltsMps(kSpeedAt12VoltsMps)
+				.withSpeedAt12VoltsMps(MAX_MOVE_VELOCITY)
 				.withSteerInertia(kSteerInertia)
 				.withDriveInertia(kDriveInertia)
 				.withSteerFrictionVoltage(kSteerFrictionVoltage)
 				.withDriveFrictionVoltage(kDriveFrictionVoltage)
-				.withFeedbackSource(SteerFeedbackType.FusedCANcoder);
-		// .withCouplingGearRatio(kCoupleRatio)
-		// .withSteerMotorInverted(kSteerMotorReversed);
+				.withFeedbackSource(SteerFeedbackType.FusedCANcoder)
+				.withCouplingGearRatio(3.5)
+				.withSteerMotorInverted(false);
 
 		private static final SwerveModuleConstants FrontLeft = ConstantCreator.createModuleConstants(
 				FRONT_LEFT_TURN_ID,

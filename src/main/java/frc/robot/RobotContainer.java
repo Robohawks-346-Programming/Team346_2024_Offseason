@@ -56,7 +56,6 @@ public class RobotContainer {
 		}
 		drivetrain.registerTelemetry(telemetry::telemeterize);
 		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
-		drivetrain.setVelocitySupplier(telemetry::getVelocity);
 	}
 
 	private void configureCommands() {
@@ -67,21 +66,5 @@ public class RobotContainer {
 
 	public Command getAutonomousCommand() {
 		return drivetrain.getAutoCommand();
-	}
-
-	public void robotPeriodic() {
-		Logger.recordOutput("localizer/RobotPose", telemetry.getFieldToRobot());
-		Logger.recordOutput(
-				"localizer/RobotVelocity",
-				new Pose2d(
-						telemetry.getFieldToRobot().getX()
-								+ (telemetry.getVelocity().getX()
-										* 0.01),
-						telemetry.getFieldToRobot().getY()
-								+ (telemetry.getVelocity().getY()
-										* 0.01),
-						telemetry.getFieldToRobot().getRotation()));
-
-		telemetry.logDataSynchronously();
 	}
 }

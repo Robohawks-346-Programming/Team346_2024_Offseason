@@ -69,13 +69,6 @@ public class Telemetry {
 	DoublePublisher accelY = driveStats.getDoubleTopic("Acceleration Y").publish();
 	DoublePublisher odomPeriod = driveStats.getDoubleTopic("Odometry Period").publish();
 
-	double velocityXFiltered = 0.0;
-	double velocityYFiltered = 0.0;
-	LinearFilter velocityXFilter = LinearFilter.singlePoleIIR(0.1, 0.020);
-	LinearFilter velocityYFilter = LinearFilter.singlePoleIIR(0.1, 0.020);
-	LinearFilter accelXFilter = LinearFilter.singlePoleIIR(0.1, 0.020);
-	LinearFilter accelYFilter = LinearFilter.singlePoleIIR(0.1, 0.020);
-
 	double accelXFiltered = 0.0;
 	double accelYFiltered = 0.0;
 	/* Keep a reference of the last pose to calculate the speeds */
@@ -168,11 +161,6 @@ public class Telemetry {
 		velocityY.set(velocities.getY());
 		accelX.set(telemetryInputs.accelerationX);
 		accelY.set(telemetryInputs.accelerationY);
-
-		velocityXFiltered = velocityXFilter.calculate(velocityFieldRelative.getX());
-		velocityYFiltered = velocityYFilter.calculate(velocityFieldRelative.getY());
-		accelXFiltered = accelXFilter.calculate(telemetryInputs.accelerationX);
-		accelYFiltered = accelYFilter.calculate(telemetryInputs.accelerationY);
 		odomPeriod.set(state.OdometryPeriod);
 
 		latestModuleStates = state.ModuleStates;
@@ -226,10 +214,6 @@ public class Telemetry {
 				new Rotation3d(0, 0, getRotationRadians()));
 	}
 
-	public Translation2d getVelocity() {
-		return new Translation2d(velocityXFiltered, velocityYFiltered);
-	}
-
 	public SwerveModuleState[] getModuleStates() {
 		SwerveModuleState[] states = new SwerveModuleState[4];
 		for (int i = 0; i < 4; i++) {
@@ -239,14 +223,6 @@ public class Telemetry {
 					Rotation2d.fromRadians(state.angle.getRadians()));
 		}
 		return states;
-	}
-
-	public double getVelocityX() {
-		return velocityXFiltered;
-	}
-
-	public double getVelocityY() {
-		return velocityYFiltered;
 	}
 
 	public double getAccelerationX() {

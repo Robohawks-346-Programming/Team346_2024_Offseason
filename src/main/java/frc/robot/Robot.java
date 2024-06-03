@@ -59,7 +59,6 @@ public class Robot extends LoggedRobot {
 	public void robotPeriodic() {
 		long start = HALUtil.getFPGATime();
 		CommandScheduler.getInstance().run();
-		m_robotContainer.robotPeriodic();
 		SmartDashboard.putNumber("Loop Cycle Time", (HALUtil.getFPGATime() - start) / 1000);
 	}
 

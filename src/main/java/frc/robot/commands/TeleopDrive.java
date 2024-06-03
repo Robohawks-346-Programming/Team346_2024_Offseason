@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
@@ -28,10 +29,6 @@ public class TeleopDrive extends Command {
 
 	double headingTarget;
 	double deadzone;
-
-	private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-			.withDeadband(deadzone).withRotationalDeadband(deadzone) // Add a 10% deadband
-			.withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
 	public TeleopDrive(CommandSwerveDrivetrain drive, Supplier<Double> xSpeed, Supplier<Double> ySpeed,
 			Supplier<Double> zRotation, double deadzone) {
@@ -58,6 +55,7 @@ public class TeleopDrive extends Command {
 			curXSpeed *= -1;
 			curYSpeed *= -1;
 		}
+		SmartDashboard.putNumber("Rotation", curZRotation);
 
 		Logger.recordOutput("current heading target", headingTarget);
 		Logger.recordOutput("current curZRotation", curZRotation);
