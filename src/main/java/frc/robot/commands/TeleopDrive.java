@@ -55,7 +55,6 @@ public class TeleopDrive extends Command {
 			curXSpeed *= -1;
 			curYSpeed *= -1;
 		}
-		SmartDashboard.putNumber("Rotation", curZRotation);
 
 		Logger.recordOutput("current heading target", headingTarget);
 		Logger.recordOutput("current curZRotation", curZRotation);
