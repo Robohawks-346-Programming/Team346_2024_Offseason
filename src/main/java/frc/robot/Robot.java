@@ -30,7 +30,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void robotInit() {
 		if (Constants.currentMode == Constants.Mode.REAL) {
-			Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+			// Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
 			Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
 			pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 		} else if (Constants.currentMode == Constants.Mode.SIM) {

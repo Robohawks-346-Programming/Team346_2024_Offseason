@@ -20,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -46,6 +48,11 @@ public class Module {
 		// separate robot with different tuning)
 		switch (Constants.currentMode) {
 			case REAL:
+				driveFeedforward = new SimpleMotorFeedforward(DriveConstants.DRIVE_kS, DriveConstants.DRIVE_kV);
+				driveFeedback = new PIDController(DriveConstants.DRIVE_P, DriveConstants.DRIVE_I,
+						DriveConstants.DRIVE_D);
+				turnFeedback = new PIDController(DriveConstants.TURN_P, DriveConstants.TURN_I, DriveConstants.TURN_D);
+				break;
 			case REPLAY:
 				driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
 				driveFeedback = new PIDController(0.05, 0.0, 0.0);

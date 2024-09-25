@@ -37,101 +37,98 @@ import frc.robot.subsystems.TestDrive.ModuleIOSim;
 
 public class RobotContainer {
 
-	// CommandSwerveDrivetrain drivetrain = DriveConstants.drivetrain;
-	// DriverControllerXbox m_driverControls;
-	// Telemetry telemetry;
+	CommandSwerveDrivetrain drivetrain = DriveConstants.DriveTrain;
+	DriverControllerXbox m_driverControls;
+	Telemetry telemetry;
 
-	Drive drive;
-	CommandXboxController controller;
-	private final LoggedDashboardChooser<Command> autoChooser;
+	// Drive drive;
+	// CommandXboxController controller;
+	// private final LoggedDashboardChooser<Command> autoChooser;
 
 	public RobotContainer() {
 		configureSubsystems();
 		configureBindings();
 		configureCommands();
-		autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-		autoChooser.addDefaultOption("StageTestBot", new PathPlannerAuto("StageTestBot"));
+		// autoChooser = new LoggedDashboardChooser<>("Auto Choices",
+		// AutoBuilder.buildAutoChooser());
+		// autoChooser.addDefaultOption("StageTestBot", new
+		// PathPlannerAuto("StageTestBot"));
 	}
 
 	private void configureBindings() {
-		// m_driverControls = new
-		// DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
+		m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
-		controller = new CommandXboxController(0);
+		// controller = new CommandXboxController(0);
 	}
 
 	private void configureSubsystems() {
-		// switch (Constants.currentMode) {
-		// case REAL:
-		// telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new
-		// TelemetryIOLive());
-		// break;
-		// case SIM:
-		// telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new
-		// TelemetryIOSim());
-
-		// drivetrain.seedFieldRelative(new Pose2d());
-		// break;
-		// case REPLAY:
-		// telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO()
-		// {
-		// });
-		// drivetrain.seedFieldRelative(new Pose2d());
-		// break;
-		// }
-		// drivetrain.registerTelemetry(telemetry::telemeterize);
-		// drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
-
 		switch (Constants.currentMode) {
 			case REAL:
-				drive = new Drive(
-						new GyroIOPigeon(false),
-						new ModuleIOKraken(0),
-						new ModuleIOKraken(1),
-						new ModuleIOKraken(2),
-						new ModuleIOKraken(3));
+				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOLive());
 				break;
 			case SIM:
-				drive = new Drive(
-						new GyroIO() {
-						},
-						new ModuleIOSim(),
-						new ModuleIOSim(),
-						new ModuleIOSim(),
-						new ModuleIOSim());
+				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOSim());
+
+				drivetrain.seedFieldRelative(new Pose2d());
 				break;
 			case REPLAY:
-				drive = new Drive(
-						new GyroIO() {
-						},
-						new ModuleIO() {
-						},
-						new ModuleIO() {
-						},
-						new ModuleIO() {
-						},
-						new ModuleIO() {
-						});
+				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO() {
+				});
+				drivetrain.seedFieldRelative(new Pose2d());
 				break;
 		}
+		drivetrain.registerTelemetry(telemetry::telemeterize);
+		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
+
+		// switch (Constants.currentMode) {
+		// case REAL:
+		// drive = new Drive(
+		// new GyroIOPigeon(false),
+		// new ModuleIOKraken(0),
+		// new ModuleIOKraken(1),
+		// new ModuleIOKraken(2),
+		// new ModuleIOKraken(3));
+		// break;
+		// case SIM:
+		// drive = new Drive(
+		// new GyroIO() {
+		// },
+		// new ModuleIOSim(),
+		// new ModuleIOSim(),
+		// new ModuleIOSim(),
+		// new ModuleIOSim());
+		// break;
+		// case REPLAY:
+		// drive = new Drive(
+		// new GyroIO() {
+		// },
+		// new ModuleIO() {
+		// },
+		// new ModuleIO() {
+		// },
+		// new ModuleIO() {
+		// },
+		// new ModuleIO() {
+		// });
+		// break;
+		// }
 	}
 
 	private void configureCommands() {
-		// drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, () ->
-		// m_driverControls.getDriveForward(),
-		// () -> m_driverControls.getDriveLeft(), () ->
-		// m_driverControls.getDriveRotation(),
-		// OperatorConstants.DEADZONE));
-		drive.setDefaultCommand(
-				JoystickDrive.joystickDrive(
-						drive,
-						() -> -controller.getLeftY(),
-						() -> -controller.getLeftX(),
-						() -> -controller.getRightX()));
+		drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
+				() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
+				OperatorConstants.DEADZONE));
+
+		// drive.setDefaultCommand(
+		// JoystickDrive.joystickDrive(
+		// drive,
+		// () -> -controller.getLeftY(),
+		// () -> -controller.getLeftX(),
+		// () -> -controller.getRightX()));
 	}
 
 	public Command getAutonomousCommand() {
-		// return drivetrain.getAutoCommand();
-		return autoChooser.get();
+		return drivetrain.getAutoCommand();
+		// return autoChooser.get();
 	}
 }

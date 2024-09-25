@@ -92,7 +92,24 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 				this::seedFieldRelative,
 				this::getCurrentRobotChassisSpeeds,
 				(speeds) -> this.setControl(AutoRequest.withSpeeds(speeds)),
-				Constants.AutoConstants.HOLONOMIC_PATH_FOLLOWER_CONFIG,
+				new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig,
+													// this
+													// should
+													// likely
+													// live
+													// in
+													// your
+													// Constants
+													// class
+						new PIDConstants(Constants.AutoConstants.AUTO_DRIVE_P, Constants.AutoConstants.AUTO_DRIVE_I,
+								Constants.AutoConstants.AUTO_DRIVE_D), // Translation PID constants
+						new PIDConstants(Constants.AutoConstants.AUTO_TURN_P, Constants.AutoConstants.AUTO_TURN_I,
+								Constants.AutoConstants.AUTO_TURN_D), // Rotation PID constants
+						6, // Max module speed, in m/s
+						driveBaseRadius, // Drive base radius in meters. Distance from robot center to
+											// furthest module.
+						new ReplanningConfig() // Default path replanning config. See the API for the options here
+				),
 				() -> {
 					var alliance = DriverStation.getAlliance();
 					if (alliance.isPresent()) {
