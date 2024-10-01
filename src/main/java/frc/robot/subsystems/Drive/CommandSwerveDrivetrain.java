@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -36,8 +37,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+
+import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonUtils;
 
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
 
@@ -50,8 +54,18 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 	private Notifier simNotifier = null;
 	private double lastSimTime;
 
+	/* Keep track if we've ever applied the operator perspective before or not */
+	private boolean hasAppliedOperatorPerspective = false;
+	/* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
+	private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
+	/* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
+	private final Rotation2d RedAlliancePerspectiveRotation = Rotation2d.fromDegrees(180);
+
 	private Supplier<Pose2d> getFieldToRobot = () -> new Pose2d();
 	private Supplier<Translation2d> getRobotVelocity = () -> new Translation2d();
+
+	private Pose2d redGoal = new Pose2d(new Translation2d(16.579342, 5.547868), new Rotation2d());
+	private Pose2d blueGoal = new Pose2d(new Translation2d(0.0381, 5.547868), new Rotation2d());
 
 	public CommandSwerveDrivetrain(
 			SwerveDrivetrainConstants driveTrainConstants,
@@ -182,5 +196,51 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
 	public void setVelocitySupplier(Supplier<Translation2d> getRobotVelocity) {
 		this.getRobotVelocity = getRobotVelocity;
+	}
+
+	@Override
+	public void periodic() {
+		/* Periodically try to apply the operator perspective */
+		/*
+		 * If we haven't applied the operator perspective before, then we should apply
+		 * it regardless of DS state
+		 */
+		/*
+		 * This allows us to correct the perspective in case the robot code restarts
+		 * mid-match
+		 */
+		/*
+		 * Otherwise, only check and apply the operator perspective if the DS is
+		 * disabled
+		 */
+		/*
+		 * This ensures driving behavior doesn't change until an explicit disable event
+		 * occurs during testing
+		 */
+		if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+			DriverStation.getAlliance().ifPresent((allianceColor) -> {
+				this.setOperatorPerspectiveForward(
+						allianceColor == Alliance.Red ? RedAlliancePerspectiveRotation
+								: BlueAlliancePerspectiveRotation);
+				hasAppliedOperatorPerspective = true;
+			});
+		}
+
+		SmartDashboard.putNumber("Distance To Target", getDistanceFromSpeaker());
+	}
+
+	private boolean isRedAlliance() {
+		Optional<Alliance> alliance = DriverStation.getAlliance();
+		if (alliance != null) {
+			return alliance.get() == DriverStation.Alliance.Red;
+		}
+		return false;
+	}
+
+	public double getDistanceFromSpeaker() {
+		Pose2d target = isRedAlliance() ? redGoal : blueGoal;
+		Pose2d robot = this.getPose();
+		double distance = PhotonUtils.getDistanceToPose(target, robot);
+		return distance;
 	}
 }

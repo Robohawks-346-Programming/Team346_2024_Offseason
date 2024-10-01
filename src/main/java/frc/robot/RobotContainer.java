@@ -4,42 +4,40 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import java.beans.Visibility;
+import java.rmi.dgc.Lease;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.OI.DriverControllerXbox;
-import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.TeleopDrive;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.LEDs;
+import frc.robot.subsystems.NotePath;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.Telemetry;
 import frc.robot.subsystems.Drive.TelemetryIO;
 import frc.robot.subsystems.Drive.TelemetryIOLive;
 import frc.robot.subsystems.Drive.TelemetryIOSim;
-import frc.robot.subsystems.TestDrive.Drive;
-import frc.robot.subsystems.TestDrive.GyroIO;
-import frc.robot.subsystems.TestDrive.GyroIOPigeon;
-import frc.robot.subsystems.TestDrive.ModuleIO;
-import frc.robot.subsystems.TestDrive.ModuleIOKraken;
-import frc.robot.subsystems.TestDrive.ModuleIOSim;
+import frc.robot.subsystems.Vision.Vision;
 
 public class RobotContainer {
 
 	CommandSwerveDrivetrain drivetrain = DriveConstants.DriveTrain;
 	DriverControllerXbox m_driverControls;
 	Telemetry telemetry;
+	Pivot pivot = new Pivot(drivetrain);
+	NotePath notePath = new NotePath();
+	Climber climber = new Climber();
+	Vision vision = new Vision(drivetrain);
+	LEDs leds = new LEDs(notePath, vision);
+	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
 	// Drive drive;
 	// CommandXboxController controller;
@@ -59,6 +57,33 @@ public class RobotContainer {
 		m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
 		// controller = new CommandXboxController(0);
+
+		JoystickButton BUTTON_1 = new JoystickButton(operatorControl, 1),
+				BUTTON_2 = new JoystickButton(operatorControl, 2),
+				BUTTON_3 = new JoystickButton(operatorControl, 3),
+				BUTTON_4 = new JoystickButton(operatorControl, 4),
+				BUTTON_5 = new JoystickButton(operatorControl, 5),
+				BUTTON_6 = new JoystickButton(operatorControl, 6),
+				BUTTON_7 = new JoystickButton(operatorControl, 7),
+				BUTTON_8 = new JoystickButton(operatorControl, 8),
+				BUTTON_9 = new JoystickButton(operatorControl, 9),
+				BUTTON_10 = new JoystickButton(operatorControl, 10),
+				BUTTON_11 = new JoystickButton(operatorControl, 11),
+				BUTTON_12 = new JoystickButton(operatorControl, 12),
+				BUTTON_13 = new JoystickButton(operatorControl, 13),
+				BUTTON_14 = new JoystickButton(operatorControl, 14),
+				BUTTON_15 = new JoystickButton(operatorControl, 15),
+				BUTTON_16 = new JoystickButton(operatorControl, 16);
+
+		BUTTON_1.whileTrue(notePath.intake());
+		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
+		BUTTON_3.onTrue(notePath.rev());
+		BUTTON_4.onTrue(pivot.moveArm(-32));
+		BUTTON_8.onTrue(pivot.moveArm(-60));
+		BUTTON_5.onTrue(pivot.moveArm(55));
+		BUTTON_6.onTrue(pivot.moveArm(0));
+		BUTTON_7.onTrue(pivot.moveArm(90));
+
 	}
 
 	private void configureSubsystems() {

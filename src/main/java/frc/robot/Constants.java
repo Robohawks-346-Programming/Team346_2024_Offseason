@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.mechanisms.swerve.SimSwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
@@ -17,7 +18,11 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
@@ -71,28 +76,28 @@ public class Constants {
 		public static final int FRONT_LEFT_TURN_ID = 22;
 		public static final int FRONT_LEFT_ENCODER_ID = 23;
 		public static final boolean FRONT_LEFT_DRIVE_MOTOR_INVERT = true;
-		public static final double FRONT_LEFT_TURN_OFFSET = 0.68212890625;
+		public static final double FRONT_LEFT_TURN_OFFSET = 0.67212890625;
 
 		// Back left Swerve Module
 		public static final int BACK_LEFT_DRIVE_ID = 31;
 		public static final int BACK_LEFT_TURN_ID = 32;
 		public static final int BACK_LEFT_ENCODER_ID = 33;
 		public static final boolean BACK_LEFT_DRIVE_MOTOR_INVERT = true;
-		public static final double BACK_LEFT_TURN_OFFSET = 0.31982421875;
+		public static final double BACK_LEFT_TURN_OFFSET = 0.30982421875;
 
 		// Front Right Swerve Module
 		public static final int FRONT_RIGHT_DRIVE_ID = 24;
 		public static final int FRONT_RIGHT_TURN_ID = 25;
 		public static final int FRONT_RIGHT_ENCODER_ID = 26;
 		public static final boolean FRONT_RIGHT_DRIVE_MOTOR_INVERT = true;
-		public static final double FRONT_RIGHT_TURN_OFFSET = 0.916259765625;
+		public static final double FRONT_RIGHT_TURN_OFFSET = 0.906259765625;
 
 		// Back Right Swerve Module
 		public static final int BACK_RIGHT_DRIVE_ID = 34;
 		public static final int BACK_RIGHT_TURN_ID = 35;
 		public static final int BACK_RIGHT_ENCODER_ID = 36;
 		public static final boolean BACK_RIGHT_DRIVE_MOTOR_INVERT = true;
-		public static final double BACK_RIGHT_TURN_OFFSET = 0.071533203125;
+		public static final double BACK_RIGHT_TURN_OFFSET = 0.061533203125;
 
 		public static final double DRIVE_P = 1.5;
 		public static final double DRIVE_I = 0;
@@ -101,9 +106,12 @@ public class Constants {
 		public static final double DRIVE_kV = 1.85;
 		public static final double DRIVE_kA = 0;
 
-		public static final double TURN_P = 10;
-		public static final double TURN_I = 0;
-		public static final double TURN_D = 0;
+		public static final double TURN_P = 150;
+		public static final double TURN_I = 50;
+		public static final double TURN_D = 0.2;
+		public static final double TURN_kS = 0.25;
+		public static final double TURN_kV = 1.5;
+		public static final double TURN_kA = 0;
 
 		// Both sets of gains need to be tuned to your individual robot.
 
@@ -111,17 +119,17 @@ public class Constants {
 		// the
 		// output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
 		private static final Slot0Configs steerGains = new Slot0Configs()
-				.withKP(100).withKI(0).withKD(0.2)
-				.withKS(0).withKV(1.5).withKA(0);
+				.withKP(TURN_P).withKI(TURN_I).withKD(TURN_D)
+				.withKS(TURN_kS).withKV(TURN_kV).withKA(TURN_kA);
 		// When using closed-loop control, the drive motor uses the control
 		// output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
 		private static final Slot0Configs driveGains = new Slot0Configs()
-				.withKP(3).withKI(0).withKD(0)
-				.withKS(0).withKV(0).withKA(0);
+				.withKP(DRIVE_P).withKI(DRIVE_I).withKD(DRIVE_D)
+				.withKS(DRIVE_kS).withKV(DRIVE_kV).withKA(DRIVE_kA);
 
 		// The closed-loop output type to use for the steer motors;
 		// This affects the PID/FF gains for the steer motors
-		private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+		private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
 		// The closed-loop output type to use for the drive motors;
 		// This affects the PID/FF gains for the drive motors
 		private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
@@ -169,7 +177,7 @@ public class Constants {
 		private static final boolean kInvertLeftSide = false;
 		private static final boolean kInvertRightSide = true;
 
-		private static final String kCANbusName = "rio";
+		private static final String kCANbusName = "";
 		private static final int kPigeonId = 0;
 
 		// These are only used for simulation
@@ -208,7 +216,7 @@ public class Constants {
 		private static final int kFrontLeftDriveMotorId = 21;
 		private static final int kFrontLeftSteerMotorId = 22;
 		private static final int kFrontLeftEncoderId = 23;
-		private static final double kFrontLeftEncoderOffset = 0.334716796875;
+		private static final double kFrontLeftEncoderOffset = 0.335;
 		private static final boolean kFrontLeftSteerInvert = false;
 
 		private static final double kFrontLeftXPosInches = 10.25;
@@ -218,7 +226,7 @@ public class Constants {
 		private static final int kFrontRightDriveMotorId = 24;
 		private static final int kFrontRightSteerMotorId = 25;
 		private static final int kFrontRightEncoderId = 26;
-		private static final double kFrontRightEncoderOffset = -0.42822265625;
+		private static final double kFrontRightEncoderOffset = -0.435;
 		private static final boolean kFrontRightSteerInvert = false;
 
 		private static final double kFrontRightXPosInches = 10.25;
@@ -228,7 +236,7 @@ public class Constants {
 		private static final int kBackLeftDriveMotorId = 31;
 		private static final int kBackLeftSteerMotorId = 32;
 		private static final int kBackLeftEncoderId = 33;
-		private static final double kBackLeftEncoderOffset = -0.325927734375;
+		private static final double kBackLeftEncoderOffset = -0.31103515625;
 		private static final boolean kBackLeftSteerInvert = false;
 
 		private static final double kBackLeftXPosInches = -10.25;
@@ -238,7 +246,7 @@ public class Constants {
 		private static final int kBackRightDriveMotorId = 34;
 		private static final int kBackRightSteerMotorId = 35;
 		private static final int kBackRightEncoderId = 36;
-		private static final double kBackRightEncoderOffset = 0.406494140625;
+		private static final double kBackRightEncoderOffset = 0.407;
 		private static final boolean kBackRightSteerInvert = false;
 
 		private static final double kBackRightXPosInches = -10.25;
@@ -286,4 +294,106 @@ public class Constants {
 		public static final double DEADZONE = 0.05;
 	}
 
+	public static final class NotePathConstants {
+		public static final int FEEDER_ROLLER_MOTOR_ID = 6;
+		public static final int AMP_ROLLER_MOTOR_ID = 5;
+		public static final int INTAKE_MOTOR_ID = 15;
+		public static final int CENTERING_MOTOR_ID = 16;
+
+		public static final double FEEDER_ROLLER_SPEED = 0.45;
+		public static final double AMP_ROLLERS_ROLLER_SPEED_1 = 0.6;
+		public static final double AMP_ROLLERS_ROLLER_SPEED_2 = 0.9;
+		public static final double INTAKE_MOTOR_SPEED = 0.95;
+
+		public static final int TOP_SPEAKER_ROLLER_MOTOR_ID = 10;
+		public static final int BOTTOM_SPEAKER_ROLLER_MOTOR_ID = 11;
+
+		public static final double SPEAKER_SHOOTER_P = 0.5;
+		public static final double SPEAKER_SHOOTER_I = 0;
+		public static final double SPEAKER_SHOOTER_D = 0;
+
+		public static final double SPEAKER_SHOOTER_kV = 0;
+
+		public static final int BEAM_BREAK_PORT = 9;
+	}
+
+	public static final class PivotConstants {
+		public static final int PIVOT_MOTOR_ID = 8;
+
+		public static final double PIVOT_GEAR_RATIO = 55.6; // 55.6 motor rev : 1 arm rev
+
+		public static final double HOME_PIVOT_ANGLE = -55;
+		public static final double TRAP_PIVOT_ANGLE = 90; // off vertical
+		public static final double SOURCE_PIVOT_ANGLE = 45; // off vertical
+		public static final double PIVOT_ANGLE_THRESHOLD = 10; // in degrees
+
+		public static final double PIVOT_P = 25;
+		public static final double PIVOT_I = 0;
+		public static final double PIVOT_D = 3;
+
+		public static final double PIVOT_kS = 0.4;
+		public static final double PIVOT_kG = 0.67;
+		public static final double PIVOT_kV = 0.2;
+		public static final double PIVOT_kA = 0;
+
+		public static InterpolatingDoubleTreeMap getPivotMap() {
+			InterpolatingDoubleTreeMap pivotMap = new InterpolatingDoubleTreeMap();
+			pivotMap.put(Units.inchesToMeters(57), -55.0);
+			pivotMap.put(Units.inchesToMeters(77), -43.5);
+			pivotMap.put(Units.inchesToMeters(96.5), -38.0);
+			pivotMap.put(Units.inchesToMeters(116.5), -30.5);
+			pivotMap.put(Units.inchesToMeters(136.5), -27.25);
+			pivotMap.put(Units.inchesToMeters(156.5), -23.25);
+			pivotMap.put(Units.inchesToMeters(176.5), -21.0);
+			pivotMap.put(Units.inchesToMeters(196.5), -20.5);
+			pivotMap.put(Units.inchesToMeters(216.5), -20.25);
+			return pivotMap;
+		}
+	}
+
+	public static final class ClimberConstants {
+		public static final int LEFT_HOOK_MOTOR_ID = 2;
+		public static final int RIGHT_HOOK_MOTOR_ID = 3;
+
+		public static final double HOOK_P = 0.05;
+		public static final double HOOK_I = 0;
+		public static final double HOOK_D = 0;
+
+		public static final double CLIMBER_REV_THRESHOLD = 5;
+
+		public static final double CLIMB_REV = 1000;
+		public static final double CLIMB_HOME_REV = 860;
+
+	}
+
+	public static final class LEDConstants {
+		public static final int LED_PORT = 0;
+		public static final int NUMBER_OF_LEDS = 81;
+	}
+
+	public static final class VisionConstants {
+
+		public static final String[] cameraNames = {
+				"FL",
+				"FR",
+				"BL",
+				"BR"
+		};
+
+		public static final Transform3d[] vehicleToCameras = { // 10 deg yaw, 5 deg pitch
+				new Transform3d(new Translation3d(Units.inchesToMeters(-12), Units.inchesToMeters(5.75),
+						Units.inchesToMeters(25.5)), new Rotation3d(0, 0, 0)),
+				new Transform3d(new Translation3d(Units.inchesToMeters(12), Units.inchesToMeters(5.75),
+						Units.inchesToMeters(25.5)), new Rotation3d(0, 0, 0)),
+				new Transform3d(
+						new Translation3d(Units.inchesToMeters(-9.75), Units.inchesToMeters(-12.75),
+								Units.inchesToMeters(20.6666666666)),
+						new Rotation3d(0, 0, Units.degreesToRadians(180))),
+				new Transform3d(new Translation3d(Units.inchesToMeters(9.75), Units.inchesToMeters(-12.75),
+						Units.inchesToMeters(20.66666666)), new Rotation3d(0, 0, Units.degreesToRadians(180)))
+		};
+
+		public static final double SINGLE_TAG_AMBIGUITY_CUTOFF = 0.02;
+
+	}
 }
