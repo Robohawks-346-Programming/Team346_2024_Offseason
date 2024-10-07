@@ -17,6 +17,8 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -24,6 +26,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 
@@ -32,6 +36,8 @@ public class Constants {
 	public static enum Mode {
 		REAL, SIM, REPLAY
 	}
+
+	public static final double loopTime = 0.02;
 
 	public static final Mode currentMode = Robot.isReal() ? Mode.REAL : Mode.SIM;
 
@@ -301,7 +307,7 @@ public class Constants {
 		public static final int CENTERING_MOTOR_ID = 16;
 
 		public static final double FEEDER_ROLLER_SPEED = 0.45;
-		public static final double AMP_ROLLERS_ROLLER_SPEED_1 = 0.6;
+		public static final double AMP_ROLLERS_ROLLER_SPEED_1 = 0.5;
 		public static final double AMP_ROLLERS_ROLLER_SPEED_2 = 0.9;
 		public static final double INTAKE_MOTOR_SPEED = 0.95;
 
@@ -393,7 +399,18 @@ public class Constants {
 						Units.inchesToMeters(20.66666666)), new Rotation3d(0, 0, Units.degreesToRadians(180)))
 		};
 
-		public static final double SINGLE_TAG_AMBIGUITY_CUTOFF = 0.02;
+		public static final double singleTagAmbiguityCutoff = 0.05;
+
+		// 0.45 from 2023
+		public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 2);
+		// 1.2 from 2023
+		public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.2, 2.2, 10);
+		public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(25.0, 25.0, 10);
+
+		public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
+
+		public static final double midfieldLowThresholdM = 5.87;
+		public static final double midfieldHighThresholdM = 10.72;
 
 	}
 }

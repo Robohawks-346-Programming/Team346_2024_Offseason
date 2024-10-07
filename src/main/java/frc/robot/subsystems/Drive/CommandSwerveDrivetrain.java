@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -198,37 +198,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 		this.getRobotVelocity = getRobotVelocity;
 	}
 
-	@Override
-	public void periodic() {
-		/* Periodically try to apply the operator perspective */
-		/*
-		 * If we haven't applied the operator perspective before, then we should apply
-		 * it regardless of DS state
-		 */
-		/*
-		 * This allows us to correct the perspective in case the robot code restarts
-		 * mid-match
-		 */
-		/*
-		 * Otherwise, only check and apply the operator perspective if the DS is
-		 * disabled
-		 */
-		/*
-		 * This ensures driving behavior doesn't change until an explicit disable event
-		 * occurs during testing
-		 */
-		if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-			DriverStation.getAlliance().ifPresent((allianceColor) -> {
-				this.setOperatorPerspectiveForward(
-						allianceColor == Alliance.Red ? RedAlliancePerspectiveRotation
-								: BlueAlliancePerspectiveRotation);
-				hasAppliedOperatorPerspective = true;
-			});
-		}
-
-		SmartDashboard.putNumber("Distance To Target", getDistanceFromSpeaker());
-	}
-
 	private boolean isRedAlliance() {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		if (alliance != null) {
@@ -242,5 +211,16 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 		Pose2d robot = this.getPose();
 		double distance = PhotonUtils.getDistanceToPose(target, robot);
 		return distance;
+	}
+
+	public double getHeadingToSpeaker() {
+		Pose2d target = isRedAlliance() ? redGoal : blueGoal;
+		Pose2d robot = this.getPose();
+		Rotation2d robotYaw = Rotation2d
+				.fromRadians(Math.atan2(target.getY() - robot.getTranslation().getY(),
+						target.getX() - robot.getTranslation().getX()))
+				.plus(new Rotation2d(Units.degreesToRadians(180)));
+		// SmartDashboard.putNumber("Heading To Target", robotYaw.getDegrees());
+		return robotYaw.getDegrees();
 	}
 }

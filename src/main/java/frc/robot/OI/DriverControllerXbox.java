@@ -1,13 +1,20 @@
 package frc.robot.OI;
 
+import edu.wpi.first.wpilibj.Tracer;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class DriverControllerXbox {
 
 	CommandXboxController m_controller;
+	public Trigger rightBumper, x, y, rightTrigger;
 
 	public DriverControllerXbox(int xboxControllerPort) {
 		m_controller = new CommandXboxController(xboxControllerPort);
+		rightBumper = m_controller.rightBumper();
+		x = m_controller.x();
+		y = m_controller.y();
+		rightTrigger = m_controller.rightTrigger();
 	}
 
 	public double getDriveForward() {

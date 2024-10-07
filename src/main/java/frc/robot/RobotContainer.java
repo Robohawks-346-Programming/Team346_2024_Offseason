@@ -6,15 +6,42 @@ package frc.robot;
 
 import java.beans.Visibility;
 import java.rmi.dgc.Lease;
+import java.security.AllPermission;
 
+<<<<<<< Updated upstream
+=======
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
+>>>>>>> Stashed changes
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+<<<<<<< Updated upstream
+=======
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+>>>>>>> Stashed changes
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.OI.DriverControllerXbox;
+<<<<<<< Updated upstream
+=======
+import frc.robot.commands.DistanceShoot;
+import frc.robot.commands.JoystickDrive;
+>>>>>>> Stashed changes
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LEDs;
@@ -39,7 +66,11 @@ public class RobotContainer {
 	LEDs leds = new LEDs(notePath, vision);
 	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
+<<<<<<< Updated upstream
 	// Drive drive;
+=======
+	// public static Drive drive;
+>>>>>>> Stashed changes
 	// CommandXboxController controller;
 	// private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -76,6 +107,7 @@ public class RobotContainer {
 				BUTTON_16 = new JoystickButton(operatorControl, 16);
 
 		BUTTON_1.whileTrue(notePath.intake());
+<<<<<<< Updated upstream
 		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
 		BUTTON_3.onTrue(notePath.rev());
 		BUTTON_4.onTrue(pivot.moveArm(-32));
@@ -83,6 +115,28 @@ public class RobotContainer {
 		BUTTON_5.onTrue(pivot.moveArm(55));
 		BUTTON_6.onTrue(pivot.moveArm(0));
 		BUTTON_7.onTrue(pivot.moveArm(90));
+=======
+		BUTTON_2.whileTrue(notePath.outtake());
+		BUTTON_3.whileTrue(notePath.rev());
+		BUTTON_4.onTrue(pivot.moveArm(-32));
+		BUTTON_5.onTrue(pivot.moveArm(55));
+		BUTTON_6.onTrue(pivot.moveArm(0));
+		BUTTON_7.onTrue(pivot.moveArm(90));
+		BUTTON_8.onTrue(pivot.moveArm(-60));
+		BUTTON_9.whileTrue(notePath.index());
+		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
+		BUTTON_11.whileTrue(climber.leftHookUp());
+		BUTTON_12.whileTrue(climber.moveHooksUp());
+		BUTTON_13.whileTrue(climber.moveHooksDown());
+		BUTTON_14.whileTrue(climber.rightHookUp());
+		BUTTON_15.whileTrue(pivot.moveArm(-21));
+		BUTTON_16.whileTrue(notePath.ejectAmpCommand());
+
+		m_driverControls.rightBumper.onTrue(Commands.runOnce(() -> drivetrain.seedFieldRelative(
+				new Pose2d(new Translation2d(drivetrain.getPose().getX(), drivetrain.getPose().getY()),
+						apply(drivetrain.getPose().getRotation())))));
+		m_driverControls.rightTrigger.onTrue(new DistanceShoot(drivetrain, pivot, notePath));
+>>>>>>> Stashed changes
 
 	}
 
@@ -103,7 +157,12 @@ public class RobotContainer {
 				break;
 		}
 		drivetrain.registerTelemetry(telemetry::telemeterize);
+<<<<<<< Updated upstream
 		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
+=======
+		// drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
+		// drivetrain.setVelocitySupplier(telemetry::getVelocity);
+>>>>>>> Stashed changes
 
 		// switch (Constants.currentMode) {
 		// case REAL:
@@ -150,10 +209,41 @@ public class RobotContainer {
 		// () -> -controller.getLeftY(),
 		// () -> -controller.getLeftX(),
 		// () -> -controller.getRightX()));
+<<<<<<< Updated upstream
+=======
+
+		NamedCommands.registerCommand("Intake", notePath.intake());
+		NamedCommands.registerCommand("Shoot", notePath.shoot());
+		NamedCommands.registerCommand("Distance Shoot", new DistanceShoot(drivetrain, pivot, notePath));
+>>>>>>> Stashed changes
 	}
 
 	public Command getAutonomousCommand() {
 		return drivetrain.getAutoCommand();
 		// return autoChooser.get();
+<<<<<<< Updated upstream
+=======
+	}
+
+	public static boolean shouldFlip() {
+		return DriverStation.getAlliance().isPresent()
+				&& DriverStation.getAlliance().get() == Alliance.Red;
+	}
+
+	public static Rotation2d apply(Rotation2d rotation) {
+		if (shouldFlip()) {
+			return new Rotation2d(-rotation.getCos(), rotation.getSin());
+		} else {
+			return rotation;
+		}
+	}
+
+	public void setOperatorPerspective() {
+		DriverStation.getAlliance().ifPresent((allianceColor) -> {
+			drivetrain.setOperatorPerspectiveForward(
+					allianceColor == Alliance.Red ? Rotation2d.fromDegrees(0)
+							: Rotation2d.fromDegrees(180));
+		});
+>>>>>>> Stashed changes
 	}
 }

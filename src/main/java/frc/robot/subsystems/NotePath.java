@@ -30,7 +30,7 @@ public class NotePath extends SubsystemBase {
 
 	private final VelocityVoltage voltage;
 	private final VoltageOut volts;
-	private final CoastOut coast = new CoastOut();
+	private final CoastOut coast;
 
 	private DigitalInput laserBreak;
 
@@ -77,8 +77,8 @@ public class NotePath extends SubsystemBase {
 		laserBreak = new DigitalInput(Constants.NotePathConstants.BEAM_BREAK_PORT);
 
 		voltage = new VelocityVoltage(0);
-
 		volts = new VoltageOut(0);
+		coast = new CoastOut();
 	}
 
 	public void startIndex() {
@@ -140,7 +140,11 @@ public class NotePath extends SubsystemBase {
 		return Commands.runEnd(() -> startIndex(), () -> stopIndex())
 				.until(() -> {
 					return getLaserBreak();
-				}).andThen();
+				});
+	}
+
+	public Command index() {
+		return Commands.runEnd(() -> startIndex(), () -> stopIndex());
 	}
 
 	public Command ejectAmpCommand() {
@@ -148,16 +152,22 @@ public class NotePath extends SubsystemBase {
 	}
 
 	public Command ejectSpeakerCommand() {
-		return Commands.runEnd(() -> ejectSpeaker(), () -> stopIndex()).andThen();
+		return Commands.runEnd(() -> ejectSpeaker(), () -> stopIndex());
 	}
 
 	public Command rev() {
-		return Commands.runEnd(() -> setVelocity(120, 120), () -> stopIndex()).andThen();
+		return Commands.runEnd(() -> setVelocity(120, 120), () -> stopIndex());
 	}
 
 	public Command shoot() {
 		return Commands.sequence(
 				rev().withTimeout(0.4),
 				ejectSpeakerCommand().withTimeout(0.4));
+	}
+
+	public Command distanceShoot() {
+		return Commands.sequence(
+				outtake().withTimeout(0.1),
+				ejectSpeakerCommand().withTimeout(1));
 	}
 }

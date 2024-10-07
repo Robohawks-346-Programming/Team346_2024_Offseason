@@ -96,16 +96,15 @@ public class Climber extends SubsystemBase {
 		// rightHookPIDController.setReference(setpoint,
 		// CANSparkMax.ControlType.kPosition);
 
-		return Commands.runEnd(() -> Commands.parallel(
-				this.rightHookUp(),
-				this.leftHookUp()),
-				() -> stopHooks());
+		return Commands.parallel(
+				rightHookUp(),
+				leftHookUp()).finallyDo(() -> stopHooks());
 	}
 
 	public Command moveHooksDown() {
-		return Commands.runEnd(() -> Commands.parallel(
+		return Commands.parallel(
 				Commands.runEnd(() -> leftHook.set(-0.75), () -> stopHooks()),
-				Commands.runEnd(() -> rightHook.set(-0.75), () -> stopHooks())),
-				() -> stopHooks());
+				Commands.runEnd(() -> rightHook.set(-0.75), () -> stopHooks()))
+				.finallyDo(() -> stopHooks());
 	}
 }

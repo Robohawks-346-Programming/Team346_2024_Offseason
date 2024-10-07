@@ -36,6 +36,7 @@ public class Arducam {
 	private volatile Pose3d calculatedPose = new Pose3d();
 	private volatile Pose3d intermediatePose = new Pose3d();
 	private volatile double timestamp = 1;
+	private volatile Matrix<N3, N1> stdevs;
 	private String name;
 
 	private CommandSwerveDrivetrain m_drive;
@@ -56,47 +57,28 @@ public class Arducam {
 			return;
 
 		PhotonPipelineResult result = camera.getLatestResult();
+		if (result.getTimestampSeconds() == timestamp)
+			return;
+		timestamp = result.getTimestampSeconds();
+
 		Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(result);
-		if (estimatedPose.isEmpty())
-			return;
-		EstimatedRobotPose estimation = estimatedPose.get();
-		if (estimation.timestampSeconds == timestamp)
-			return;
-		if (estimation.targetsUsed.size() == 1)
-			return;
 
-		intermediatePose = estimation.estimatedPose;
-
-		if (intermediatePose.getZ() > 1 || intermediatePose.getZ() < -0.1) {
-			return;
-		}
-
-		for (PhotonTrackedTarget target : estimation.targetsUsed) {
-			if (target.getPoseAmbiguity() > 0.18) {
+		if (estimatedPose.get().targetsUsed.size() == 1) {
+			double ambiguity = estimatedPose.get().targetsUsed.get(0).getPoseAmbiguity();
+			if (ambiguity > VisionConstants.singleTagAmbiguityCutoff || ambiguity == -1) {
 				return;
 			}
 		}
 
-		// if (Math.abs(Math.toDegrees(intermediatePose.getX()) -
-		// RobotContainer.drivetrain.poseEstimator.getEstimatedPosition().getX()) <
-		// 0.05){
-		// return;
-		// }
+		Pose3d pose = estimatedPose.get().estimatedPose;
+		if (pose.getZ() > 1 || pose.getZ() < -0.1) {
+			return;
+		}
 
-		// if (Math.abs(Math.toDegrees(intermediatePose.getY()) -
-		// RobotContainer.drivetrain.poseEstimator.getEstimatedPosition().getY()) <
-		// 0.05){
-		// return;
-		// }
-
-		// if (Math.abs(intermediatePose.getRotation().getAngle() -
-		// RobotContainer.drivetrain.poseEstimator.getEstimatedPosition().getRotation().getDegrees())
-		// < 5){
-		// return;
-		// }
-
-		calculatedPose = estimation.estimatedPose;
-		timestamp = estimation.timestampSeconds;
+		calculatedPose = estimatedPose.get().estimatedPose;
+		timestamp = estimatedPose.get().timestampSeconds;
+		stdevs = cameraUncertainty(calculateAverageTagDistance(estimatedPose.get()),
+				estimatedPose.get().targetsUsed.size());
 		hasNewPose = true;
 		// SmartDashboard.putBoolean(name+"Works", true);
 
@@ -107,34 +89,42 @@ public class Arducam {
 	}
 
 	public void recordVisionObservation() {
-		m_drive.addVisionMeasurement(calculatedPose.toPose2d(), timestamp);
+		m_drive.addVisionMeasurement(calculatedPose.toPose2d(), timestamp, stdevs);
 		hasNewPose = false;
 	}
 
-	public double getSpeakerFull() {
-		if (name == "BR" || name == "BL") {
-			if (DriverStation.getAlliance().isPresent()
-					&& DriverStation.getAlliance().get().equals(DriverStation.Alliance.Red)) {
-				for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
-					if (target.getFiducialId() == 4) {
-						return target.getBestCameraToTarget().getX();
-					}
-				}
-				return -1.0;
-			} else if (DriverStation.getAlliance().isPresent()
-					&& DriverStation.getAlliance().get().equals(DriverStation.Alliance.Blue)) {
-				for (PhotonTrackedTarget target : camera.getLatestResult().getTargets()) {
-					if (target.getFiducialId() == 7) {
-						return target.getBestCameraToTarget().getX();
-					}
-				}
-				return -1.0;
-			} else {
-				return -1;
-			}
+	private Matrix<N3, N1> cameraUncertainty(double averageTagDistanceM, int nTags) {
+		/*
+		 * On this year's field, AprilTags are arranged into rough 'corridors' between
+		 * the stage and
+		 * speaker, and a central 'desert,' where few tags can be found. It follows that
+		 * we should
+		 * determine the variance of our camera measurements based on that.
+		 */
+		if (nTags < 2) {
+			return VisionConstants.singleTagUncertainty;
+		} else if (averageTagDistanceM < 6.0 && this.robotInMidField()) {
+			return VisionConstants.lowCameraUncertainty;
 		} else {
-			return -1.0;
+			return VisionConstants.highCameraUncertainty;
 		}
+	}
+
+	private boolean robotInMidField() {
+		return m_drive.getPose().getX() > VisionConstants.midfieldLowThresholdM
+				&& m_drive.getPose().getX() < VisionConstants.midfieldHighThresholdM;
+	}
+
+	private static double calculateAverageTagDistance(EstimatedRobotPose pose) {
+		double distance = 0.0;
+		for (PhotonTrackedTarget target : pose.targetsUsed) {
+			distance += target.getBestCameraToTarget()
+					.getTranslation()
+					.getDistance(new Translation3d());
+		}
+		distance /= pose.targetsUsed.size();
+
+		return distance;
 	}
 
 }
