@@ -14,13 +14,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StageTestBot.1"
+            "pathName": "Stage Side.1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "StageTestBot.2"
+            "pathName": "Stage Side.2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Stage Side.3"
           }
         }
       ]
