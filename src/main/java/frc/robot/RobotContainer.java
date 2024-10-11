@@ -8,8 +8,7 @@ import java.beans.Visibility;
 import java.rmi.dgc.Lease;
 import java.security.AllPermission;
 
-<<<<<<< Updated upstream
-=======
+<<<<<<<Updated upstream=======
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -18,7 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
->>>>>>> Stashed changes
+>>>>>>>Stashed changes
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,22 +25,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj2.command.Command;
-<<<<<<< Updated upstream
-=======
+import edu.wpi.first.wpilibj2.command.Command;<<<<<<<Updated upstream=======
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
->>>>>>> Stashed changes
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;>>>>>>>Stashed changes
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.OI.DriverControllerXbox;
-<<<<<<< Updated upstream
-=======
+import frc.robot.OI.DriverControllerXbox;<<<<<<<Updated upstream=======
 import frc.robot.commands.DistanceShoot;
-import frc.robot.commands.JoystickDrive;
->>>>>>> Stashed changes
+import frc.robot.commands.JoystickDrive;>>>>>>>Stashed changes
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LEDs;
@@ -66,11 +59,13 @@ public class RobotContainer {
 	LEDs leds = new LEDs(notePath, vision);
 	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
-<<<<<<< Updated upstream
+	<<<<<<<
+	Updated upstream
 	// Drive drive;
-=======
+	=======
 	// public static Drive drive;
->>>>>>> Stashed changes
+	>>>>>>>
+	Stashed changes
 	// CommandXboxController controller;
 	// private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -157,12 +152,8 @@ public class RobotContainer {
 				break;
 		}
 		drivetrain.registerTelemetry(telemetry::telemeterize);
-<<<<<<< Updated upstream
-		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
-=======
 		// drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
 		// drivetrain.setVelocitySupplier(telemetry::getVelocity);
->>>>>>> Stashed changes
 
 		// switch (Constants.currentMode) {
 		// case REAL:
@@ -209,20 +200,15 @@ public class RobotContainer {
 		// () -> -controller.getLeftY(),
 		// () -> -controller.getLeftX(),
 		// () -> -controller.getRightX()));
-<<<<<<< Updated upstream
-=======
 
 		NamedCommands.registerCommand("Intake", notePath.intake());
 		NamedCommands.registerCommand("Shoot", notePath.shoot());
 		NamedCommands.registerCommand("Distance Shoot", new DistanceShoot(drivetrain, pivot, notePath));
->>>>>>> Stashed changes
 	}
 
 	public Command getAutonomousCommand() {
 		return drivetrain.getAutoCommand();
 		// return autoChooser.get();
-<<<<<<< Updated upstream
-=======
 	}
 
 	public static boolean shouldFlip() {
