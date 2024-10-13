@@ -4,11 +4,10 @@ The purpose of this repo is to test new software with the existing 2024 comp rob
 ## Planned Changes
 - [x] Autoformat
 - [ ] Advantage Kit
-- [ ] CTRE Swerve Generator
-- [ ] Updated Commands trees
-- [ ] Branching Autos
-- [ ] Better Kalman Filters for vision
-- [ ] Driver Automation regarding note detection, shooting, amping, and trapping
+- [x] CTRE Swerve Generator
+- [x] Updated Commands trees
+- [x] Better Kalman Filters for vision
+- [x] Driver Automation regarding shooting
 
 ## Automatic Formatting with `spotless`
 
