@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7474133372306824,
+      "y": 6.707301616668701
+    },
+    "rotation": 57.724377197011684
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": " Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side.3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.8603811860084534,
+      "y": 4.4006218910217285
+    },
+    "rotation": -61.18918135541879
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Aaron.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Aaron.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot 2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}
