@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4689719676971436,
+      "y": 5.546205520629883
+    },
+    "rotation": -6.062500300371893e-28
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 note.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 note.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

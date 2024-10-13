@@ -19,7 +19,7 @@ public class RotateToSpeaker extends Command {
 	public RotateToSpeaker(CommandSwerveDrivetrain drive) {
 		m_drive = drive;
 		addRequirements(m_drive);
-		m_turnController = new PIDController(0.09, 0, 0);
+		m_turnController = new PIDController(0.04, 0, 0);
 		m_turnController.enableContinuousInput(-180, 180);
 	}
 

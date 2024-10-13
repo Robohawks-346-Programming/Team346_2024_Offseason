@@ -12,15 +12,33 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Shoot 2"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Stage Side.1"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Stage Side.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Distance Shoot 2"
           }
         },
         {

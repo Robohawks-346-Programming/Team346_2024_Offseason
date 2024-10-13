@@ -134,7 +134,7 @@ public class Pivot extends SubsystemBase {
 		pivotMotor.set(-0.06);
 	}
 
-	public void driveDown() {
-		pivotMotor.set(-0.02);
+	public Command driveDown() {
+		return Commands.runEnd(() -> pivotMotor.set(-0.02), () -> pivotMotor.set(0));
 	}
 }

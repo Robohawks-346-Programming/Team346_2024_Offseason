@@ -133,14 +133,14 @@ public class NotePath extends SubsystemBase {
 	}
 
 	public Command outtake() {
-		return Commands.runEnd(() -> reverseIndex(), () -> stopIndex());
+		return Commands.run(() -> reverseIndex()).finallyDo(() -> stopIndex());
 	}
 
 	public Command intake() {
-		return Commands.runEnd(() -> startIndex(), () -> stopIndex())
+		return Commands.run(() -> startIndex())
 				.until(() -> {
 					return getLaserBreak();
-				});
+				}).finallyDo(() -> stopIndex());
 	}
 
 	public Command index() {
@@ -156,7 +156,7 @@ public class NotePath extends SubsystemBase {
 	}
 
 	public Command rev() {
-		return Commands.runEnd(() -> setVelocity(120, 120), () -> stopIndex());
+		return Commands.run(() -> setVelocity(120, 120)).finallyDo(() -> stopIndex());
 	}
 
 	public Command shoot() {
@@ -168,6 +168,6 @@ public class NotePath extends SubsystemBase {
 	public Command distanceShoot() {
 		return Commands.sequence(
 				outtake().withTimeout(0.1),
-				ejectSpeakerCommand().withTimeout(1));
+				ejectSpeakerCommand().withTimeout(0.75));
 	}
 }

@@ -7,8 +7,6 @@ package frc.robot;
 import java.beans.Visibility;
 import java.rmi.dgc.Lease;
 import java.security.AllPermission;
-
-<<<<<<<Updated upstream=======
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -17,7 +15,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
->>>>>>>Stashed changes
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,16 +22,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import edu.wpi.first.wpilibj2.command.Command;<<<<<<<Updated upstream=======
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;>>>>>>>Stashed changes
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.OI.DriverControllerXbox;<<<<<<<Updated upstream=======
+import frc.robot.OI.DriverControllerXbox;
 import frc.robot.commands.DistanceShoot;
-import frc.robot.commands.JoystickDrive;>>>>>>>Stashed changes
+import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LEDs;
@@ -59,20 +56,20 @@ public class RobotContainer {
 	LEDs leds = new LEDs(notePath, vision);
 	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
-	<<<<<<<
-	Updated upstream
 	// Drive drive;
-	=======
 	// public static Drive drive;
-	>>>>>>>
-	Stashed changes
 	// CommandXboxController controller;
 	// private final LoggedDashboardChooser<Command> autoChooser;
 
 	public RobotContainer() {
+		NamedCommands.registerCommand("Intake 2", Commands.parallel(notePath.intake(),
+				pivot.driveDown()));
+		NamedCommands.registerCommand("Shoot 2", notePath.shoot());
+		NamedCommands.registerCommand("Distance Shoot 2", new DistanceShoot(drivetrain, pivot, notePath));
 		configureSubsystems();
 		configureBindings();
 		configureCommands();
+		drivetrain.configurePathPlanner();
 		// autoChooser = new LoggedDashboardChooser<>("Auto Choices",
 		// AutoBuilder.buildAutoChooser());
 		// autoChooser.addDefaultOption("StageTestBot", new
@@ -101,16 +98,15 @@ public class RobotContainer {
 				BUTTON_15 = new JoystickButton(operatorControl, 15),
 				BUTTON_16 = new JoystickButton(operatorControl, 16);
 
-		BUTTON_1.whileTrue(notePath.intake());
-<<<<<<< Updated upstream
+		BUTTON_1.whileTrue(Commands.parallel(notePath.intake(),
+				pivot.driveDown()));
 		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
-		BUTTON_3.onTrue(notePath.rev());
+		BUTTON_3.whileTrue(notePath.rev());
 		BUTTON_4.onTrue(pivot.moveArm(-32));
 		BUTTON_8.onTrue(pivot.moveArm(-60));
 		BUTTON_5.onTrue(pivot.moveArm(55));
 		BUTTON_6.onTrue(pivot.moveArm(0));
 		BUTTON_7.onTrue(pivot.moveArm(90));
-=======
 		BUTTON_2.whileTrue(notePath.outtake());
 		BUTTON_3.whileTrue(notePath.rev());
 		BUTTON_4.onTrue(pivot.moveArm(-32));
@@ -131,7 +127,10 @@ public class RobotContainer {
 				new Pose2d(new Translation2d(drivetrain.getPose().getX(), drivetrain.getPose().getY()),
 						apply(drivetrain.getPose().getRotation())))));
 		m_driverControls.rightTrigger.onTrue(new DistanceShoot(drivetrain, pivot, notePath));
->>>>>>> Stashed changes
+		m_driverControls.leftTrigger.onTrue(
+				new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
+						() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
+						OperatorConstants.DEADZONE));
 
 	}
 
@@ -200,10 +199,6 @@ public class RobotContainer {
 		// () -> -controller.getLeftY(),
 		// () -> -controller.getLeftX(),
 		// () -> -controller.getRightX()));
-
-		NamedCommands.registerCommand("Intake", notePath.intake());
-		NamedCommands.registerCommand("Shoot", notePath.shoot());
-		NamedCommands.registerCommand("Distance Shoot", new DistanceShoot(drivetrain, pivot, notePath));
 	}
 
 	public Command getAutonomousCommand() {
@@ -230,6 +225,5 @@ public class RobotContainer {
 					allianceColor == Alliance.Red ? Rotation2d.fromDegrees(0)
 							: Rotation2d.fromDegrees(180));
 		});
->>>>>>> Stashed changes
 	}
 }

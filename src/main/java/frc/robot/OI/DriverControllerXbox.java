@@ -7,11 +7,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class DriverControllerXbox {
 
 	CommandXboxController m_controller;
-	public Trigger rightBumper, x, y, rightTrigger;
+	public Trigger rightBumper, x, y, rightTrigger, leftTrigger;
 
 	public DriverControllerXbox(int xboxControllerPort) {
 		m_controller = new CommandXboxController(xboxControllerPort);
 		rightBumper = m_controller.rightBumper();
+		leftTrigger = m_controller.leftTrigger();
 		x = m_controller.x();
 		y = m_controller.y();
 		rightTrigger = m_controller.rightTrigger();
