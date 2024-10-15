@@ -106,22 +106,6 @@ public class Pivot extends SubsystemBase {
 		pivotMotor.stopMotor();
 	}
 
-	public double lerp(double a, double b, double c, double d) {
-		return (c * (b - pivotMotor.getPosition().getValue()) + d * (pivotMotor.getPosition().getValue() - a))
-				/ (b - a);
-	}
-
-	public void moveArmLerp(double wantedRevs, double curretRevs) {
-		double currentPose = getPosition();
-		if (wantedRevs > currentPose) {
-			pivotMotor.set(lerp(curretRevs, wantedRevs, 1, 0.3));
-		} else if (wantedRevs < currentPose) {
-			pivotMotor.set(-lerp(curretRevs, wantedRevs, 1, 0.3));
-		} else {
-			pivotMotor.set(0);
-		}
-	}
-
 	public double getPosition() {
 		return pivotMotor.getPosition().getValue();
 	}
@@ -136,5 +120,11 @@ public class Pivot extends SubsystemBase {
 
 	public Command driveDown() {
 		return Commands.runEnd(() -> pivotMotor.set(-0.02), () -> pivotMotor.set(0));
+	}
+
+	public Command feedPivot() {
+		return Commands.runOnce(() -> pivotMotor.setControl(position.withPosition(
+				convertDegreesToRotations(
+						Math.asin((m_drive.getDistanceFromSpeaker() * 9.81) / (Math.pow(28.728, 2))) * 0.5))));
 	}
 }

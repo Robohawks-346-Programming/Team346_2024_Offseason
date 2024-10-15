@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.OI.DriverControllerXbox;
+import frc.robot.commands.AutoFeed;
 import frc.robot.commands.DistanceShoot;
 import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.TeleopDrive;
@@ -131,6 +132,7 @@ public class RobotContainer {
 				new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
 						() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
 						OperatorConstants.DEADZONE));
+		m_driverControls.x.onTrue(new AutoFeed(drivetrain, pivot, notePath));
 
 	}
 
