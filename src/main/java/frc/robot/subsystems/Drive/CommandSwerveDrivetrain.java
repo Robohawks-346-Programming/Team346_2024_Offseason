@@ -66,6 +66,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 	private Pose2d redGoal = new Pose2d(new Translation2d(16.579342, 5.547868), new Rotation2d());
 	private Pose2d blueGoal = new Pose2d(new Translation2d(0.0381, 5.547868), new Rotation2d());
 
+	private Pose2d redFeed = new Pose2d(new Translation2d(17, 8), new Rotation2d());
+	private Pose2d blueFeed = new Pose2d(new Translation2d(0.0, 8), new Rotation2d());
+
 	public CommandSwerveDrivetrain(
 			SwerveDrivetrainConstants driveTrainConstants,
 			double OdometryUpdateFrequency,
@@ -214,6 +217,17 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
 	public double getHeadingToSpeaker() {
 		Pose2d target = isRedAlliance() ? redGoal : blueGoal;
+		Pose2d robot = this.getPose();
+		Rotation2d robotYaw = Rotation2d
+				.fromRadians(Math.atan2(target.getY() - robot.getTranslation().getY(),
+						target.getX() - robot.getTranslation().getX()))
+				.plus(new Rotation2d(Units.degreesToRadians(180)));
+		// SmartDashboard.putNumber("Heading To Target", robotYaw.getDegrees());
+		return robotYaw.getDegrees();
+	}
+
+	public double getHeadingToFeed() {
+		Pose2d target = isRedAlliance() ? redFeed : blueFeed;
 		Pose2d robot = this.getPose();
 		Rotation2d robotYaw = Rotation2d
 				.fromRadians(Math.atan2(target.getY() - robot.getTranslation().getY(),

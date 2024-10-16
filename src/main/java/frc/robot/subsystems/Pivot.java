@@ -125,6 +125,8 @@ public class Pivot extends SubsystemBase {
 	public Command feedPivot() {
 		return Commands.runOnce(() -> pivotMotor.setControl(position.withPosition(
 				convertDegreesToRotations(
-						Math.asin((m_drive.getDistanceFromSpeaker() * 9.81) / (Math.pow(28.728, 2))) * 0.5))));
+						Math.toDegrees(
+								Math.asin((m_drive.getDistanceFromSpeaker() * 9.81) / (Math.pow(28.728, 2)))
+										* 0.5)))));
 	}
 }

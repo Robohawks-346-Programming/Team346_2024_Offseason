@@ -224,8 +224,8 @@ public class RobotContainer {
 	public void setOperatorPerspective() {
 		DriverStation.getAlliance().ifPresent((allianceColor) -> {
 			drivetrain.setOperatorPerspectiveForward(
-					allianceColor == Alliance.Red ? Rotation2d.fromDegrees(0)
-							: Rotation2d.fromDegrees(180));
+					allianceColor == Alliance.Red ? Rotation2d.fromDegrees(180)
+							: Rotation2d.fromDegrees(0));
 		});
 	}
 }

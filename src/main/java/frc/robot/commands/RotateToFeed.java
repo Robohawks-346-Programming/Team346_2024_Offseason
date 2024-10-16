@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drive.*;
 
-public class RotateToSpeaker extends Command {
+public class RotateToFeed extends Command {
 	PIDController m_turnController;
 	double turnSpeed;
 	CommandSwerveDrivetrain m_drive;
 
-	public RotateToSpeaker(CommandSwerveDrivetrain drive) {
+	public RotateToFeed(CommandSwerveDrivetrain drive) {
 		m_drive = drive;
 		addRequirements(m_drive);
 		m_turnController = new PIDController(2, 0, 0);
@@ -30,7 +30,7 @@ public class RotateToSpeaker extends Command {
 						.withVelocityX(0)
 						.withVelocityY(0)
 						.withRotationalRate(m_turnController.calculate(m_drive.getPose().getRotation().getRadians(),
-								Math.toRadians(m_drive.getHeadingToSpeaker())))
+								Math.toRadians(m_drive.getHeadingToFeed())))
 						.withDriveRequestType(DriveRequestType.Velocity));
 	}
 

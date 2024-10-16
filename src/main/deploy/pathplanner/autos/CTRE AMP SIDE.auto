@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": " Shoot 2"
+            "name": "Shoot 2"
           }
         },
         {
@@ -45,6 +45,12 @@
           "type": "path",
           "data": {
             "pathName": "Amp Side.3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side.4"
           }
         },
         {

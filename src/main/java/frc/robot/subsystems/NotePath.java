@@ -170,8 +170,4 @@ public class NotePath extends SubsystemBase {
 				outtake().withTimeout(0.1),
 				ejectSpeakerCommand().withTimeout(0.75));
 	}
-
-	public Command feed() {
-		return Commands.run(() -> setVelocity(90, 90)).finallyDo(() -> stopIndex());
-	}
 }
