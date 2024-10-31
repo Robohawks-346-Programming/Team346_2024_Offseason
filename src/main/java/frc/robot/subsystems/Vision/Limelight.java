@@ -24,8 +24,8 @@ public class Limelight {
 			seesNote = true;
 		} else {
 			seesNote = false;
-
 		}
+		SmartDashboard.putBoolean("limelightnote", seesNote);
 	}
 
 	public boolean getSeesNote() {

@@ -23,9 +23,9 @@ public class DistanceShoot extends SequentialCommandGroup {
 		addCommands(
 				Commands.sequence(
 						Commands.parallel(
-								new RotateToSpeaker(m_drive).withTimeout(1.5),
+								new RotateToSpeaker(m_drive).withTimeout(1.25),
 								m_pivot.distanceBasedArmPivot(),
-								m_notePath.rev().withTimeout(1.5)),
+								m_notePath.rev().withTimeout(1.25)),
 						Commands.race(m_notePath.distanceShoot(), m_notePath.rev()),
 						m_pivot.moveArm(-55)));
 	}

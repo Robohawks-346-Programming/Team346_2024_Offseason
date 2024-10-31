@@ -3,8 +3,6 @@ package frc.robot.commands;
 import java.util.Currency;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
@@ -55,9 +53,6 @@ public class TeleopDrive extends Command {
 			curXSpeed *= -1;
 			curYSpeed *= -1;
 		}
-
-		Logger.recordOutput("current heading target", headingTarget);
-		Logger.recordOutput("current curZRotation", curZRotation);
 
 		m_drive.drive(curXSpeed, curYSpeed, curZRotation);
 	}

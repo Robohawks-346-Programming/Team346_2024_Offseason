@@ -1,22 +1,25 @@
 package frc.robot.OI;
 
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj.Tracer;
+import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public class DriverControllerXbox {
+public class DriverControllerPS5 {
 
-	CommandXboxController m_controller;
-	public Trigger rightBumper, x, y, rightTrigger, leftTrigger, leftBumper;
+	CommandPS5Controller m_controller;
+	public Trigger rightBumper, cross, circle, rightTrigger, leftTrigger, leftBumper, square;
 
-	public DriverControllerXbox(int xboxControllerPort) {
-		m_controller = new CommandXboxController(xboxControllerPort);
-		rightBumper = m_controller.rightBumper();
-		leftBumper = m_controller.leftBumper();
-		leftTrigger = m_controller.leftTrigger();
-		x = m_controller.x();
-		y = m_controller.y();
-		rightTrigger = m_controller.rightTrigger();
+	public DriverControllerPS5(int ps5ControllerPort) {
+		m_controller = new CommandPS5Controller(ps5ControllerPort);
+		rightBumper = m_controller.R1();
+		leftBumper = m_controller.L1();
+		leftTrigger = m_controller.L2();
+		cross = m_controller.cross();
+		circle = m_controller.circle();
+		rightTrigger = m_controller.R2();
+		square = m_controller.square();
 	}
 
 	public double getDriveForward() {

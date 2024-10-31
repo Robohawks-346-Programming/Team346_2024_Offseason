@@ -4,24 +4,18 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.LogFileUtil;
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends LoggedRobot {
+public class Robot extends TimedRobot{
 	private Command m_autonomousCommand;
 	private PowerDistribution pdh;
 
@@ -29,28 +23,8 @@ public class Robot extends LoggedRobot {
 
 	@Override
 	public void robotInit() {
-		if (Constants.currentMode == Constants.Mode.REAL) {
-			// Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-			Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-			pdh = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
-		} else if (Constants.currentMode == Constants.Mode.SIM) {
-			Logger.addDataReceiver(new WPILOGWriter("logs/")); // This folder is gitignored
-			Logger.addDataReceiver(new NT4Publisher());
-		} else {
-			setUseTiming(false); // Run as fast as possible
-			String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope
-			Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-			Logger.addDataReceiver(
-					new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-		}
-
-		Logger.start();
 
 		PathfindingCommand.warmupCommand();
-
-		if (Robot.isSimulation()) {
-			DriverStation.silenceJoystickConnectionWarning(true);
-		}
 
 		m_robotContainer = new RobotContainer();
 	}

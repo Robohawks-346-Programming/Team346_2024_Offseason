@@ -38,7 +38,6 @@ public class Arducam {
 	private volatile double timestamp = 1;
 	private volatile Matrix<N3, N1> stdevs;
 	private String name;
-
 	private CommandSwerveDrivetrain m_drive;
 
 	public Arducam(String cameraName, Transform3d vehicleToCamera, CommandSwerveDrivetrain drive) {
@@ -57,11 +56,12 @@ public class Arducam {
 			return;
 
 		PhotonPipelineResult result = camera.getLatestResult();
-		if (result.getTimestampSeconds() == timestamp)
-			return;
-		timestamp = result.getTimestampSeconds();
-
 		Optional<EstimatedRobotPose> estimatedPose = poseEstimator.update(result);
+		if (estimatedPose.isEmpty())
+			return;
+		EstimatedRobotPose estimation = estimatedPose.get();
+		if (estimation.timestampSeconds == timestamp)
+			return;
 
 		if (estimatedPose.get().targetsUsed.size() == 1) {
 			double ambiguity = estimatedPose.get().targetsUsed.get(0).getPoseAmbiguity();

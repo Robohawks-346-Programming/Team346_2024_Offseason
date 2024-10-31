@@ -24,9 +24,7 @@ public class AutoFeed extends SequentialCommandGroup {
 				Commands.sequence(
 						Commands.parallel(
 								new RotateToFeed(m_drive).withTimeout(1),
-								m_pivot.feedPivot(),
-								m_notePath.rev().withTimeout(1.5)),
-						Commands.race(m_notePath.distanceShoot(), m_notePath.rev()),
-						m_pivot.moveArm(-55)));
+								m_notePath.feed().withTimeout(1)),
+						Commands.race(m_notePath.distanceShoot(), m_notePath.feed())));
 	}
 }

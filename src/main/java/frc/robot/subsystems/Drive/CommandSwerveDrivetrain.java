@@ -39,7 +39,6 @@ import frc.robot.Constants;
 
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonUtils;
 
 public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
@@ -168,7 +167,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 	}
 
 	public void setBrakeMode() {
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < 4; i++) {
 			this.getModule(i)
 					.getDriveMotor()
 					.setNeutralMode(NeutralModeValue.Brake);

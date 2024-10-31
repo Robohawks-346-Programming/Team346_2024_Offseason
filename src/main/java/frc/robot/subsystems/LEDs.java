@@ -42,7 +42,7 @@ public class LEDs extends SubsystemBase {
 			if (m_notePath.getLaserBreak()) {
 				setColor(ledBuffer, Color.kGreen);
 			} else if (m_vision.getNoteVisible()) {
-				setColor(ledBuffer, Color.kOrangeRed);
+				setColor(ledBuffer, Color.kDarkOrange);
 			} else {
 				setColor(ledBuffer, Color.kRed);
 			}

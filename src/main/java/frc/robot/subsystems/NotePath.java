@@ -159,6 +159,10 @@ public class NotePath extends SubsystemBase {
 		return Commands.run(() -> setVelocity(120, 120)).finallyDo(() -> stopIndex());
 	}
 
+	public Command feed() {
+		return Commands.run(() -> setVelocity(80, 80)).finallyDo(() -> stopIndex());
+	}
+
 	public Command shoot() {
 		return Commands.sequence(
 				rev().withTimeout(0.4),

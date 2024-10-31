@@ -7,7 +7,6 @@ package frc.robot;
 import java.beans.Visibility;
 import java.rmi.dgc.Lease;
 import java.security.AllPermission;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.ForwardReference;
@@ -21,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,26 +29,24 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.OI.DriverControllerPS5;
 import frc.robot.OI.DriverControllerXbox;
 import frc.robot.commands.AutoFeed;
 import frc.robot.commands.DistanceShoot;
-import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.NotePath;
 import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Drive.Telemetry;
-import frc.robot.subsystems.Drive.TelemetryIO;
-import frc.robot.subsystems.Drive.TelemetryIOLive;
-import frc.robot.subsystems.Drive.TelemetryIOSim;
+import frc.robot.subsystems.Drive.*;
 import frc.robot.subsystems.Vision.Vision;
 
 public class RobotContainer {
 
 	CommandSwerveDrivetrain drivetrain = DriveConstants.DriveTrain;
 	DriverControllerXbox m_driverControls;
+	// DriverControllerPS5 m_driverControls;
 	Telemetry telemetry;
 	Pivot pivot = new Pivot(drivetrain);
 	NotePath notePath = new NotePath();
@@ -79,6 +77,8 @@ public class RobotContainer {
 
 	private void configureBindings() {
 		m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
+		// m_driverControls = new
+		// DriverControllerPS5(OperatorConstants.PS5_CONTROLLER_PORT);
 
 		// controller = new CommandXboxController(0);
 
@@ -99,8 +99,7 @@ public class RobotContainer {
 				BUTTON_15 = new JoystickButton(operatorControl, 15),
 				BUTTON_16 = new JoystickButton(operatorControl, 16);
 
-		BUTTON_1.whileTrue(Commands.parallel(notePath.intake(),
-				pivot.driveDown()));
+		BUTTON_1.whileTrue(Commands.parallel(notePath.intake(), pivot.driveDown()));
 		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
 		BUTTON_3.whileTrue(notePath.rev());
 		BUTTON_4.onTrue(pivot.moveArm(-32));
@@ -115,7 +114,7 @@ public class RobotContainer {
 		BUTTON_6.onTrue(pivot.moveArm(0));
 		BUTTON_7.onTrue(pivot.moveArm(90));
 		BUTTON_8.onTrue(pivot.moveArm(-60));
-		BUTTON_9.whileTrue(notePath.index());
+		BUTTON_9.whileTrue(notePath.feed());
 		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
 		BUTTON_11.whileTrue(climber.leftHookUp());
 		BUTTON_12.whileTrue(climber.moveHooksUp());
@@ -124,70 +123,21 @@ public class RobotContainer {
 		BUTTON_15.whileTrue(pivot.moveArm(-21));
 		BUTTON_16.whileTrue(notePath.ejectAmpCommand());
 
-		m_driverControls.rightBumper.onTrue(Commands.runOnce(() -> drivetrain.seedFieldRelative(
-				new Pose2d(new Translation2d(drivetrain.getPose().getX(), drivetrain.getPose().getY()),
-						apply(drivetrain.getPose().getRotation())))));
+		m_driverControls.rightBumper.onTrue(Commands.runOnce(() -> drivetrain.getPigeon2().reset()));
 		m_driverControls.rightTrigger.onTrue(new DistanceShoot(drivetrain, pivot, notePath));
-		m_driverControls.leftTrigger.onTrue(
+		m_driverControls.leftBumper.onTrue(
 				new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
 						() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
 						OperatorConstants.DEADZONE));
-		m_driverControls.x.onTrue(new AutoFeed(drivetrain, pivot, notePath));
+		m_driverControls.leftTrigger.onTrue(new AutoFeed(drivetrain, pivot, notePath));
 
 	}
 
 	private void configureSubsystems() {
-		switch (Constants.currentMode) {
-			case REAL:
-				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOLive());
-				break;
-			case SIM:
-				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOSim());
-
-				drivetrain.seedFieldRelative(new Pose2d());
-				break;
-			case REPLAY:
-				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO() {
-				});
-				drivetrain.seedFieldRelative(new Pose2d());
-				break;
-		}
+		telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY);
 		drivetrain.registerTelemetry(telemetry::telemeterize);
 		// drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
 		// drivetrain.setVelocitySupplier(telemetry::getVelocity);
-
-		// switch (Constants.currentMode) {
-		// case REAL:
-		// drive = new Drive(
-		// new GyroIOPigeon(false),
-		// new ModuleIOKraken(0),
-		// new ModuleIOKraken(1),
-		// new ModuleIOKraken(2),
-		// new ModuleIOKraken(3));
-		// break;
-		// case SIM:
-		// drive = new Drive(
-		// new GyroIO() {
-		// },
-		// new ModuleIOSim(),
-		// new ModuleIOSim(),
-		// new ModuleIOSim(),
-		// new ModuleIOSim());
-		// break;
-		// case REPLAY:
-		// drive = new Drive(
-		// new GyroIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// });
-		// break;
-		// }
 	}
 
 	private void configureCommands() {
@@ -227,5 +177,9 @@ public class RobotContainer {
 					allianceColor == Alliance.Red ? Rotation2d.fromDegrees(180)
 							: Rotation2d.fromDegrees(0));
 		});
+	}
+
+	public void createVision() {
+		vision = new Vision(drivetrain);
 	}
 }
