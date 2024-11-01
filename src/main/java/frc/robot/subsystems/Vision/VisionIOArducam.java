@@ -80,6 +80,12 @@ public class VisionIOArducam implements VisionIO {
 			return false;
 		}
 
+		for (PhotonTrackedTarget target : photonPose.targetsUsed) {
+			if (target.getPoseAmbiguity() > 0.15) {
+				return false;
+			}
+		}
+
 		Pose3d pose = photonPose.estimatedPose;
 		// check that the pose isn't insane
 		if (pose.getZ() > 1 || pose.getZ() < -0.1) {

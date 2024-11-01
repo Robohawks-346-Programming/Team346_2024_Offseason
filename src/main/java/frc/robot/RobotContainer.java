@@ -47,7 +47,6 @@ import frc.robot.subsystems.Drive.TelemetryIOSim;
 import frc.robot.subsystems.Vision.Vision;
 import frc.robot.subsystems.Vision.VisionIO;
 import frc.robot.subsystems.Vision.VisionIOArducam;
-import frc.robot.subsystems.Vision.VisionIOSim;
 
 public class RobotContainer {
 
@@ -152,10 +151,8 @@ public class RobotContainer {
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOSim());
 				drivetrain.seedFieldRelative(new Pose2d());
 				vision = new Vision(drivetrain,
-						new VisionIOSim(VisionConstants.cameraNames[0], VisionConstants.vehicleToCameras[2],
-								telemetry::getModuleStates),
-						new VisionIOSim(VisionConstants.cameraNames[3], VisionConstants.vehicleToCameras[3],
-								telemetry::getModuleStates));
+						new VisionIOArducam(VisionConstants.cameraNames[0], VisionConstants.vehicleToCameras[2]),
+						new VisionIOArducam(VisionConstants.cameraNames[3], VisionConstants.vehicleToCameras[3]));
 				break;
 			case REPLAY:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO() {

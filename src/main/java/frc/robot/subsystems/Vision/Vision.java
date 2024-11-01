@@ -1,11 +1,15 @@
 package frc.robot.subsystems.Vision;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SteadyStateKalmanFilter;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,6 +40,10 @@ public class Vision extends SubsystemBase {
 		cameras[1] = camera2;
 		cameraInputs[0] = new VisionIOInputsAutoLogged();
 		cameraInputs[1] = new VisionIOInputsAutoLogged();
+		if (Robot.isSimulation()) {
+			visionSim.addAprilTags(VisionConstants.tagLayout);
+			setupSimCameras();
+		}
 	}
 
 	@Override
@@ -43,6 +51,9 @@ public class Vision extends SubsystemBase {
 
 		m_drive.getPose();
 		SmartDashboard.putNumber("Vision Count", count);
+		if (Robot.isSimulation()) {
+			visionSim.update(m_drive.getPose());
+		}
 
 		for (int i = 0; i < cameras.length; i++) {
 			cameras[i].updateInputs(cameraInputs[i]);
@@ -72,6 +83,20 @@ public class Vision extends SubsystemBase {
 		} else {
 			return VisionConstants.highCameraUncertainty;
 		}
+	}
+
+	private void setupSimCameras() {
+		PhotonCamera camera1 = new PhotonCamera(cameraInputs[0].name);
+		PhotonCamera camera2 = new PhotonCamera(cameraInputs[1].name);
+		SimCameraProperties props = new SimCameraProperties();
+		props.setCalibration(1280, 800, Rotation2d.fromDegrees(70));
+		props.setFPS(25);
+		props.setCalibError(0.25, 0.08);
+
+		PhotonCameraSim cameraSim1 = new PhotonCameraSim(camera1, props);
+		PhotonCameraSim cameraSim2 = new PhotonCameraSim(camera2, props);
+		visionSim.addCamera(cameraSim1, VisionConstants.vehicleToCameras[2]);
+		visionSim.addCamera(cameraSim2, VisionConstants.vehicleToCameras[3]);
 	}
 
 }
