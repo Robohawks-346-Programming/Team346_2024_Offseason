@@ -48,12 +48,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Side.4"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Distance Shoot 2"

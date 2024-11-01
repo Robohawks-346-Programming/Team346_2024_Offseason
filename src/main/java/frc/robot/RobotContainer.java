@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.OI.DriverControllerXbox;
 import frc.robot.commands.AutoFeed;
 import frc.robot.commands.DistanceShoot;
@@ -44,6 +45,9 @@ import frc.robot.subsystems.Drive.TelemetryIO;
 import frc.robot.subsystems.Drive.TelemetryIOLive;
 import frc.robot.subsystems.Drive.TelemetryIOSim;
 import frc.robot.subsystems.Vision.Vision;
+import frc.robot.subsystems.Vision.VisionIO;
+import frc.robot.subsystems.Vision.VisionIOArducam;
+import frc.robot.subsystems.Vision.VisionIOSim;
 
 public class RobotContainer {
 
@@ -53,8 +57,8 @@ public class RobotContainer {
 	Pivot pivot = new Pivot(drivetrain);
 	NotePath notePath = new NotePath();
 	Climber climber = new Climber();
-	Vision vision = new Vision(drivetrain);
-	LEDs leds = new LEDs(notePath, vision);
+	Vision vision;
+	// LEDs leds = new LEDs(notePath, vision);
 	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
 	// Drive drive;
@@ -140,16 +144,26 @@ public class RobotContainer {
 		switch (Constants.currentMode) {
 			case REAL:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOLive());
+				vision = new Vision(drivetrain,
+						new VisionIOArducam(VisionConstants.cameraNames[0], VisionConstants.vehicleToCameras[2]),
+						new VisionIOArducam(VisionConstants.cameraNames[3], VisionConstants.vehicleToCameras[3]));
 				break;
 			case SIM:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOSim());
-
 				drivetrain.seedFieldRelative(new Pose2d());
+				vision = new Vision(drivetrain,
+						new VisionIOSim(VisionConstants.cameraNames[0], VisionConstants.vehicleToCameras[2],
+								telemetry::getModuleStates),
+						new VisionIOSim(VisionConstants.cameraNames[3], VisionConstants.vehicleToCameras[3],
+								telemetry::getModuleStates));
 				break;
 			case REPLAY:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO() {
 				});
 				drivetrain.seedFieldRelative(new Pose2d());
+				vision = new Vision(drivetrain, new VisionIO() {
+				}, new VisionIO() {
+				});
 				break;
 		}
 		drivetrain.registerTelemetry(telemetry::telemeterize);
