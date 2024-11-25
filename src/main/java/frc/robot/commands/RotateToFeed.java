@@ -19,7 +19,7 @@ public class RotateToFeed extends Command {
 	public RotateToFeed(CommandSwerveDrivetrain drive) {
 		m_drive = drive;
 		addRequirements(m_drive);
-		m_turnController = new PIDController(2, 0, 0);
+		m_turnController = new PIDController(0.3, 0, 0);
 		m_turnController.enableContinuousInput(Math.toRadians(-180), Math.toRadians(180));
 	}
 

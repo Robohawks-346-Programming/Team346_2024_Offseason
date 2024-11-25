@@ -168,7 +168,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 					.setNeutralMode(NeutralModeValue.Brake);
 			this.getModule(i)
 					.getSteerMotor()
-					.setNeutralMode(NeutralModeValue.Coast);
+					.setNeutralMode(NeutralModeValue.Brake);
 		}
 	}
 

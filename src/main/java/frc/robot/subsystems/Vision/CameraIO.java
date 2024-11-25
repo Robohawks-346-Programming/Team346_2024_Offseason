@@ -8,10 +8,10 @@ import edu.wpi.first.math.numbers.N3;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface VisionIO {
+public interface CameraIO {
 
 	@AutoLog
-	public static class VisionIOInputs {
+	public static class CameraIOInputs {
 		public Pose2d latestFieldToRobot = new Pose2d();
 		public double averageTagDistanceM = 0.0;
 		public Rotation2d averageTagYaw = new Rotation2d();
@@ -23,6 +23,6 @@ public interface VisionIO {
 		public boolean wasAccepted = false;
 	}
 
-	public default void updateInputs(VisionIOInputs inputs) {
+	public default void updateInputs(CameraIOInputs inputs) {
 	}
 }

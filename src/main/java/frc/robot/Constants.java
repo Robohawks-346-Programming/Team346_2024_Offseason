@@ -1,6 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+
+import java.util.List;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -82,7 +85,7 @@ public class Constants {
 		public static final double MAX_MOVE_VELOCITY = 5;
 		public static final double MAX_TURN_VELOCITY = 5;
 
-		public static final double DRIVE_P = 1.5;
+		public static final double DRIVE_P = 0;
 		public static final double DRIVE_I = 0;
 		public static final double DRIVE_D = 0;
 		public static final double DRIVE_kS = 0;
@@ -90,7 +93,7 @@ public class Constants {
 		public static final double DRIVE_kA = 0;
 
 		public static final double TURN_P = 150;
-		public static final double TURN_I = 50;
+		public static final double TURN_I = 0;
 		public static final double TURN_D = 0.2;
 		public static final double TURN_kS = 0.25;
 		public static final double TURN_kV = 1.5;
@@ -115,7 +118,7 @@ public class Constants {
 		private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
 		// The closed-loop output type to use for the drive motors;
 		// This affects the PID/FF gains for the drive motors
-		private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+		private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
 		// The stator current at which the wheels start to slip;
 		// This needs to be tuned to your individual robot
@@ -291,11 +294,11 @@ public class Constants {
 		public static final int TOP_SPEAKER_ROLLER_MOTOR_ID = 10;
 		public static final int BOTTOM_SPEAKER_ROLLER_MOTOR_ID = 11;
 
-		public static final double SPEAKER_SHOOTER_P = 0.5;
+		public static final double SPEAKER_SHOOTER_P = 4;
 		public static final double SPEAKER_SHOOTER_I = 0;
 		public static final double SPEAKER_SHOOTER_D = 0;
 
-		public static final double SPEAKER_SHOOTER_kV = 0;
+		public static final double SPEAKER_SHOOTER_kV = 12 / 98;
 
 		public static final int BEAM_BREAK_PORT = 9;
 	}
@@ -310,9 +313,9 @@ public class Constants {
 		public static final double SOURCE_PIVOT_ANGLE = 45; // off vertical
 		public static final double PIVOT_ANGLE_THRESHOLD = 10; // in degrees
 
-		public static final double PIVOT_P = 25;
+		public static final double PIVOT_P = 27;
 		public static final double PIVOT_I = 0;
-		public static final double PIVOT_D = 3;
+		public static final double PIVOT_D = 0;
 
 		public static final double PIVOT_kS = 0.4;
 		public static final double PIVOT_kG = 0.67;
@@ -356,6 +359,11 @@ public class Constants {
 
 	public static final class VisionConstants {
 
+		public static record CameraParams(
+				String name,
+				Transform3d transforms) {
+		};
+
 		public static final String[] cameraNames = {
 				"FL",
 				"FR",
@@ -375,6 +383,10 @@ public class Constants {
 				new Transform3d(new Translation3d(Units.inchesToMeters(9.75), Units.inchesToMeters(-12.75),
 						Units.inchesToMeters(20.66666666)), new Rotation3d(0, 0, Units.degreesToRadians(180)))
 		};
+
+		public static final List<CameraParams> cameras = List.of(
+				new CameraParams(cameraNames[0], vehicleToCameras[2]),
+				new CameraParams(cameraNames[3], vehicleToCameras[3]));
 
 		public static final double lowUncertaintyCutoffDistance = 6.5;
 		public static final double skewCutoffDistance = 5.8;

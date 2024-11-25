@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Vision.Vision;
+import frc.robot.subsystems.Vision.VisionSystem;
 
 public class LEDs extends SubsystemBase {
 
@@ -22,9 +22,9 @@ public class LEDs extends SubsystemBase {
 	private final Timer flashTimer = new Timer();
 
 	private NotePath m_notePath;
-	private Vision m_vision;
+	private VisionSystem m_vision;
 
-	public LEDs(NotePath notePath, Vision vision) {
+	public LEDs(NotePath notePath, VisionSystem vision) {
 		led = new AddressableLED(Constants.LEDConstants.LED_PORT);
 		ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.NUMBER_OF_LEDS);
 		led.setLength(ledBuffer.getLength());

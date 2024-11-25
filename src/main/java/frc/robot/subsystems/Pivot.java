@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -22,6 +25,8 @@ public class Pivot extends SubsystemBase {
 	private static TalonFXConfiguration pivotMotorConfig;
 
 	private PositionVoltage position;
+	private MotionMagicExpoVoltage volt;
+	private MotionMagicConfigs configs;
 
 	public final InterpolatingDoubleTreeMap pivotLookupTable = Constants.PivotConstants.getPivotMap();
 
@@ -51,9 +56,15 @@ public class Pivot extends SubsystemBase {
 
 		pivotMotorConfig.Feedback.SensorToMechanismRatio = Constants.PivotConstants.PIVOT_GEAR_RATIO;
 
-		pivotMotor.getConfigurator().apply(pivotMotorConfig);
-
 		position = new PositionVoltage(0);
+
+		volt = new MotionMagicExpoVoltage(0);
+		volt.EnableFOC = true;
+		configs = pivotMotorConfig.MotionMagic;
+		configs.MotionMagicExpo_kA = 1;
+		configs.MotionMagicExpo_kV = Constants.PivotConstants.PIVOT_kV;
+
+		pivotMotor.getConfigurator().apply(pivotMotorConfig);
 
 		// pivotMotor.setPosition(convertDegreesToRotations(Constants.PivotConstants.HOME_PIVOT_ANGLE));
 		resetPivotAngle();
@@ -72,9 +83,8 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public void moveArmToPosition(double wantedPosition) {
-		pivotMotor.setControl(position.withPosition(convertDegreesToRotations(wantedPosition)));
-		// pivotMotor.setVoltage(feedforward.calculate(Math.toRadians(wantedPosition),
-		// 0));
+		// pivotMotor.setControl(position.withPosition(convertDegreesToRotations(wantedPosition)));
+		pivotMotor.setControl(volt.withPosition(convertDegreesToRotations(wantedPosition)));
 	}
 
 	public double convertDegreesToRotations(double degrees) {
@@ -86,7 +96,7 @@ public class Pivot extends SubsystemBase {
 	}
 
 	public Command moveArm(double pos) {
-		return Commands.runOnce(() -> pivotMotor.setControl(position.withPosition(convertDegreesToRotations(pos))));
+		return Commands.runOnce(() -> pivotMotor.setControl(volt.withPosition(convertDegreesToRotations(pos))));
 	}
 
 	public Command distanceBasedArmPivot() {
@@ -94,7 +104,7 @@ public class Pivot extends SubsystemBase {
 		// RobotContainer.drivetrain.getDistanceFromSpeaker());
 		// SmartDashboard.putNumber("Wanted Arm Angle",
 		// pivotLookupTable.get(RobotContainer.drivetrain.getDistanceFromSpeaker()));
-		return Commands.runOnce(() -> pivotMotor.setControl(position.withPosition(
+		return Commands.runOnce(() -> pivotMotor.setControl(volt.withPosition(
 				convertDegreesToRotations(pivotLookupTable.get(m_drive.getDistanceFromSpeaker())))));
 	}
 

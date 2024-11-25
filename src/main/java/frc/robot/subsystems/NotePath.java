@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.CoastOut;
+import com.ctre.phoenix6.controls.MotionMagicVelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -12,6 +14,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,10 +26,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 
 public class NotePath extends SubsystemBase {
-	CANSparkMax feederRoller, ampRollers, intakeMotor, centeringMotor;
+	CANSparkMax feederRoller, ampRollers;
 
 	TalonFX topRoller, bottomRoller;
 	private TalonFXConfiguration shooterConfig = new TalonFXConfiguration();
+	private MotionMagicVelocityTorqueCurrentFOC volt = new MotionMagicVelocityTorqueCurrentFOC(0);
+	private MotionMagicConfigs config;
 
 	private final VelocityVoltage voltage;
 	private final VoltageOut volts;
@@ -37,27 +42,18 @@ public class NotePath extends SubsystemBase {
 	public NotePath() {
 		feederRoller = new CANSparkMax(Constants.NotePathConstants.FEEDER_ROLLER_MOTOR_ID, MotorType.kBrushless);
 		ampRollers = new CANSparkMax(Constants.NotePathConstants.AMP_ROLLER_MOTOR_ID, MotorType.kBrushless);
-		intakeMotor = new CANSparkMax(Constants.NotePathConstants.INTAKE_MOTOR_ID, MotorType.kBrushless);
-		centeringMotor = new CANSparkMax(Constants.NotePathConstants.CENTERING_MOTOR_ID, MotorType.kBrushless);
 
 		feederRoller.setSmartCurrentLimit(40);
 		ampRollers.setSmartCurrentLimit(40);
-		intakeMotor.setSmartCurrentLimit(40);
-		centeringMotor.setSmartCurrentLimit(40);
 
 		feederRoller.setIdleMode(IdleMode.kBrake);
 		ampRollers.setIdleMode(IdleMode.kBrake);
-		intakeMotor.setIdleMode(IdleMode.kBrake);
-		centeringMotor.setIdleMode(IdleMode.kBrake);
 
 		feederRoller.setInverted(true);
 		ampRollers.setInverted(false);
-		centeringMotor.setInverted(false);
 
 		feederRoller.burnFlash();
 		ampRollers.burnFlash();
-		intakeMotor.burnFlash();
-		centeringMotor.burnFlash();
 
 		topRoller = new TalonFX(Constants.NotePathConstants.TOP_SPEAKER_ROLLER_MOTOR_ID);
 		bottomRoller = new TalonFX(Constants.NotePathConstants.BOTTOM_SPEAKER_ROLLER_MOTOR_ID);
@@ -70,6 +66,10 @@ public class NotePath extends SubsystemBase {
 		shooterConfig.Slot0.kD = Constants.NotePathConstants.SPEAKER_SHOOTER_D;
 
 		shooterConfig.Slot0.kV = Constants.NotePathConstants.SPEAKER_SHOOTER_kV;
+
+		config = shooterConfig.MotionMagic;
+		config.MotionMagicAcceleration = 1000;
+		config.MotionMagicJerk = 4000;
 
 		bottomRoller.getConfigurator().apply(shooterConfig);
 		topRoller.getConfigurator().apply(shooterConfig);
@@ -84,22 +84,18 @@ public class NotePath extends SubsystemBase {
 	public void startIndex() {
 		feederRoller.set(Constants.NotePathConstants.AMP_ROLLERS_ROLLER_SPEED_1);
 		ampRollers.set(Constants.NotePathConstants.AMP_ROLLERS_ROLLER_SPEED_1);
-		intakeMotor.set(Constants.NotePathConstants.INTAKE_MOTOR_SPEED);
-		centeringMotor.set(Constants.NotePathConstants.INTAKE_MOTOR_SPEED);
+
 	}
 
 	public void reverseIndex() {
 		feederRoller.set(-Constants.NotePathConstants.FEEDER_ROLLER_SPEED);
 		ampRollers.set(-Constants.NotePathConstants.FEEDER_ROLLER_SPEED);
-		intakeMotor.set(-Constants.NotePathConstants.INTAKE_MOTOR_SPEED);
-		centeringMotor.set(-Constants.NotePathConstants.INTAKE_MOTOR_SPEED);
+
 	}
 
 	public void stopIndex() {
 		feederRoller.set(0);
 		ampRollers.set(0);
-		intakeMotor.set(0);
-		centeringMotor.set(0);
 		topRoller.setControl(coast);
 		bottomRoller.setControl(coast);
 	}
@@ -119,8 +115,8 @@ public class NotePath extends SubsystemBase {
 	}
 
 	public void setVelocity(double velocity, double velocity2) {
-		topRoller.setControl(voltage.withVelocity(velocity));
-		bottomRoller.setControl(voltage.withVelocity(velocity2));
+		topRoller.setControl(volt.withVelocity(velocity));
+		bottomRoller.setControl(volt.withVelocity(velocity2));
 	}
 
 	public void setVoltage(double volt) {
@@ -169,5 +165,10 @@ public class NotePath extends SubsystemBase {
 		return Commands.sequence(
 				outtake().withTimeout(0.1),
 				ejectSpeakerCommand().withTimeout(0.75));
+	}
+
+	@Override
+	public void periodic() {
+		SmartDashboard.putNumber("Shooter rev", topRoller.getVelocity().getValueAsDouble());
 	}
 }
