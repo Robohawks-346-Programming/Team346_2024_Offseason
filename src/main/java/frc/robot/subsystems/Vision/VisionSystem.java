@@ -28,6 +28,10 @@ public class VisionSystem extends SubsystemBase {
 		}
 	}
 
+	public void setCameraConsumer(Consumer<CameraMeasurement> cameraConsumer) {
+		this.cameraConsumer = cameraConsumer;
+	}
+
 	public static record CameraMeasurement(
 			Pose2d pose, double timestamp, Matrix<N3, N1> variance) {
 	}

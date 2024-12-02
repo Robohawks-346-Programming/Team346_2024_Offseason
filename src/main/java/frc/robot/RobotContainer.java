@@ -33,17 +33,20 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.OI.DriverControllerXbox;
 import frc.robot.commands.AutoFeed;
 import frc.robot.commands.DistanceShoot;
-import frc.robot.commands.JoystickDrive;
 import frc.robot.commands.TeleopDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.LEDs;
-import frc.robot.subsystems.NotePath;
-import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.Telemetry;
 import frc.robot.subsystems.Drive.TelemetryIO;
 import frc.robot.subsystems.Drive.TelemetryIOLive;
 import frc.robot.subsystems.Drive.TelemetryIOSim;
+import frc.robot.subsystems.NotePath.NotePath;
+import frc.robot.subsystems.NotePath.NotePathIO;
+import frc.robot.subsystems.NotePath.NotePathIONeo550Falcon;
+import frc.robot.subsystems.NotePath.NotePathIOSim;
+import frc.robot.subsystems.NotePath.NotePath.State;
+import frc.robot.subsystems.Pivot;
 import frc.robot.subsystems.Vision.CameraContainer;
 import frc.robot.subsystems.Vision.CameraContainerReal;
 import frc.robot.subsystems.Vision.CameraContainerReplay;
@@ -58,36 +61,31 @@ public class RobotContainer {
 	DriverControllerXbox m_driverControls;
 	Telemetry telemetry;
 	Pivot pivot = new Pivot(drivetrain);
-	NotePath notePath = new NotePath();
+	NotePath notePath;
 	Climber climber = new Climber();
 	VisionSystem vision;
-	LEDs leds = new LEDs(notePath, vision);
+	LEDs leds;
 	Joystick operatorControl = new Joystick(Constants.OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
-	// Drive drive;
-	// public static Drive drive;
-	// CommandXboxController controller;
-	// private final LoggedDashboardChooser<Command> autoChooser;
-
 	public RobotContainer() {
-		NamedCommands.registerCommand("Intake 2", Commands.parallel(notePath.intake(),
-				pivot.driveDown()));
-		NamedCommands.registerCommand("Shoot 2", notePath.shoot());
-		NamedCommands.registerCommand("Distance Shoot 2", new DistanceShoot(drivetrain, pivot, notePath));
 		configureSubsystems();
 		configureBindings();
 		configureCommands();
+		NamedCommands.registerCommand("Intake 2",
+				Commands.parallel(
+						Commands.runEnd(() -> notePath.setState(State.INTAKE), () -> notePath.setState(State.IDLE)),
+						pivot.driveDown()));
+		NamedCommands.registerCommand("Shoot 2", Commands.sequence(
+				Commands.runEnd(() -> notePath.setState(State.REV), () -> notePath.setState(State.IDLE))
+						.withTimeout(0.4),
+				Commands.runEnd(() -> notePath.setState(State.SPEAKER), () -> notePath.setState(State.IDLE))
+						.withTimeout(0.4)));
+		NamedCommands.registerCommand("Distance Shoot 2", new DistanceShoot(drivetrain, pivot, notePath));
 		drivetrain.configurePathPlanner();
-		// autoChooser = new LoggedDashboardChooser<>("Auto Choices",
-		// AutoBuilder.buildAutoChooser());
-		// autoChooser.addDefaultOption("StageTestBot", new
-		// PathPlannerAuto("StageTestBot"));
 	}
 
 	private void configureBindings() {
 		m_driverControls = new DriverControllerXbox(OperatorConstants.DRIVER_CONTROLLER_PORT);
-
-		// controller = new CommandXboxController(0);
 
 		JoystickButton BUTTON_1 = new JoystickButton(operatorControl, 1),
 				BUTTON_2 = new JoystickButton(operatorControl, 2),
@@ -106,30 +104,25 @@ public class RobotContainer {
 				BUTTON_15 = new JoystickButton(operatorControl, 15),
 				BUTTON_16 = new JoystickButton(operatorControl, 16);
 
-		BUTTON_1.whileTrue(Commands.parallel(notePath.intake(),
+		BUTTON_1.whileTrue(Commands.parallel(
+				(Commands.runEnd(() -> notePath.setState(State.INTAKE), () -> notePath.setState(State.IDLE))),
 				pivot.driveDown()));
-		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
-		BUTTON_3.whileTrue(notePath.rev());
-		BUTTON_4.onTrue(pivot.moveArm(-32));
-		BUTTON_8.onTrue(pivot.moveArm(-60));
-		BUTTON_5.onTrue(pivot.moveArm(55));
-		BUTTON_6.onTrue(pivot.moveArm(0));
-		BUTTON_7.onTrue(pivot.moveArm(90));
-		BUTTON_2.whileTrue(notePath.outtake());
-		BUTTON_3.whileTrue(notePath.rev());
+		BUTTON_2.whileTrue(Commands.runEnd(() -> notePath.setState(State.OUTAKE), () -> notePath.setState(State.IDLE)));
+		BUTTON_3.whileTrue(Commands.runEnd(() -> notePath.setState(State.REV), () -> notePath.setState(State.IDLE)));
 		BUTTON_4.onTrue(pivot.moveArm(-32));
 		BUTTON_5.onTrue(pivot.moveArm(55));
 		BUTTON_6.onTrue(pivot.moveArm(0));
 		BUTTON_7.onTrue(pivot.moveArm(90));
 		BUTTON_8.onTrue(pivot.moveArm(-60));
-		BUTTON_9.whileTrue(notePath.index());
-		BUTTON_10.whileTrue(notePath.ejectSpeakerCommand());
+		BUTTON_9.whileTrue(Commands.runEnd(() -> notePath.setState(State.INTAKE), () -> notePath.setState(State.IDLE)));
+		BUTTON_10.whileTrue(
+				Commands.runEnd(() -> notePath.setState(State.SPEAKER), () -> notePath.setState(State.IDLE)));
 		BUTTON_11.whileTrue(climber.leftHookUp());
 		BUTTON_12.whileTrue(climber.moveHooksUp());
 		BUTTON_13.whileTrue(climber.moveHooksDown());
 		BUTTON_14.whileTrue(climber.rightHookUp());
 		BUTTON_15.whileTrue(pivot.moveArm(-21));
-		BUTTON_16.whileTrue(notePath.ejectAmpCommand());
+		BUTTON_16.whileTrue(Commands.runEnd(() -> notePath.setState(State.AMP), () -> notePath.setState(State.IDLE)));
 
 		m_driverControls.rightBumper.onTrue(Commands.runOnce(() -> drivetrain.seedFieldRelative(
 				new Pose2d(new Translation2d(drivetrain.getPose().getX(), drivetrain.getPose().getY()),
@@ -148,74 +141,40 @@ public class RobotContainer {
 			case REAL:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOLive());
 				vision = new VisionSystem(new CameraContainerReal(VisionConstants.cameras));
+				notePath = new NotePath(new NotePathIONeo550Falcon());
 				break;
 			case SIM:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIOSim());
 				drivetrain.seedFieldRelative(new Pose2d());
 				vision = new VisionSystem(new CameraContainerSim(VisionConstants.cameras, telemetry::getModuleStates));
-
+				notePath = new NotePath(new NotePathIOSim());
 				break;
 			case REPLAY:
 				telemetry = new Telemetry(DriveConstants.MAX_MOVE_VELOCITY, new TelemetryIO() {
 				});
 				drivetrain.seedFieldRelative(new Pose2d());
 				vision = new VisionSystem(new CameraContainerReplay(VisionConstants.cameras));
+				notePath = new NotePath(new NotePathIO() {
+				});
 				break;
 		}
 		drivetrain.registerTelemetry(telemetry::telemeterize);
 		drivetrain.setPoseSupplier(telemetry::getFieldToRobot);
 		drivetrain.setVelocitySupplier(telemetry::getVelocity);
 
-		// switch (Constants.currentMode) {
-		// case REAL:
-		// drive = new Drive(
-		// new GyroIOPigeon(false),
-		// new ModuleIOKraken(0),
-		// new ModuleIOKraken(1),
-		// new ModuleIOKraken(2),
-		// new ModuleIOKraken(3));
-		// break;
-		// case SIM:
-		// drive = new Drive(
-		// new GyroIO() {
-		// },
-		// new ModuleIOSim(),
-		// new ModuleIOSim(),
-		// new ModuleIOSim(),
-		// new ModuleIOSim());
-		// break;
-		// case REPLAY:
-		// drive = new Drive(
-		// new GyroIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// },
-		// new ModuleIO() {
-		// });
-		// break;
-		// }
+		vision.setCameraConsumer(
+				(m) -> drivetrain.addVisionMeasurement(m.pose(), m.timestamp(), m.variance()));
+		leds = new LEDs(notePath, vision);
 	}
 
 	private void configureCommands() {
 		drivetrain.setDefaultCommand(new TeleopDrive(drivetrain, () -> m_driverControls.getDriveForward(),
 				() -> m_driverControls.getDriveLeft(), () -> m_driverControls.getDriveRotation(),
 				OperatorConstants.DEADZONE));
-
-		// drive.setDefaultCommand(
-		// JoystickDrive.joystickDrive(
-		// drive,
-		// () -> -controller.getLeftY(),
-		// () -> -controller.getLeftX(),
-		// () -> -controller.getRightX()));
 	}
 
 	public Command getAutonomousCommand() {
 		return drivetrain.getAutoCommand();
-		// return autoChooser.get();
 	}
 
 	public static boolean shouldFlip() {
