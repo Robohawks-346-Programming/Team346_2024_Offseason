@@ -92,7 +92,7 @@ public class Constants {
 		public static final double DRIVE_kV = 1.85;
 		public static final double DRIVE_kA = 0;
 
-		public static final double TURN_P = 150;
+		public static final double TURN_P = 125;
 		public static final double TURN_I = 0;
 		public static final double TURN_D = 0.2;
 		public static final double TURN_kS = 0.25;
@@ -313,7 +313,7 @@ public class Constants {
 		public static final double SOURCE_PIVOT_ANGLE = 45; // off vertical
 		public static final double PIVOT_ANGLE_THRESHOLD = 10; // in degrees
 
-		public static final double PIVOT_P = 27;
+		public static final double PIVOT_P = 29;
 		public static final double PIVOT_I = 0;
 		public static final double PIVOT_D = 0;
 

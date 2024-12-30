@@ -25,7 +25,11 @@ public class NotePath extends SubsystemBase {
 				idle();
 				break;
 			case INTAKE:
-				intake();
+				if (!hasNote()) {
+					intake();
+				} else {
+					idle();
+				}
 				break;
 			case OUTAKE:
 				outake();

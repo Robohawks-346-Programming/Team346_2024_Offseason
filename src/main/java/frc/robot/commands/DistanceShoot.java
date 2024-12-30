@@ -28,11 +28,8 @@ public class DistanceShoot extends SequentialCommandGroup {
 								m_pivot.distanceBasedArmPivot(),
 								Commands.runEnd(() -> notePath.setState(State.REV), () -> notePath.setState(State.IDLE))
 										.withTimeout(1.5)),
-						Commands.race(
-								Commands.runEnd(() -> notePath.setState(State.SPEAKER),
-										() -> notePath.setState(State.IDLE)).withTimeout(1.5),
-								Commands.runEnd(() -> notePath.setState(State.REV), () -> notePath.setState(State.IDLE))
-										.withTimeout(1.5)),
+						Commands.runEnd(() -> notePath.setState(State.SPEAKER),
+								() -> notePath.setState(State.IDLE)).withTimeout(1.5),
 						m_pivot.moveArm(-55)));
 	}
 }
