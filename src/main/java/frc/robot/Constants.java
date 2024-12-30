@@ -1,6 +1,9 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+
+import java.util.List;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -17,8 +20,11 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -59,6 +65,8 @@ public class Constants {
 		public static final double DRIVE_CONVERSION = WHEEL_CIRCUMFERENCE / DRIVETRAIN_GEAR_RATIO;
 		public static final double TURN_CONVERSION = 12.8;
 
+		public static final Pose2d initialPose = new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90));
+
 		public static final SwerveDriveKinematics DRIVE_KINEMATICS = new SwerveDriveKinematics(
 				new Translation2d(DRIVETRAIN_WHEELBASE_METERS / 2.0, DRIVETRAIN_TRACKWIDTH_METERS / 2.0), // front left
 				new Translation2d(DRIVETRAIN_WHEELBASE_METERS / 2.0, -DRIVETRAIN_TRACKWIDTH_METERS / 2.0), // front
@@ -77,43 +85,15 @@ public class Constants {
 		public static final double MAX_MOVE_VELOCITY = 5;
 		public static final double MAX_TURN_VELOCITY = 5;
 
-		// Front left Swerve Module
-		public static final int FRONT_LEFT_DRIVE_ID = 21;
-		public static final int FRONT_LEFT_TURN_ID = 22;
-		public static final int FRONT_LEFT_ENCODER_ID = 23;
-		public static final boolean FRONT_LEFT_DRIVE_MOTOR_INVERT = true;
-		public static final double FRONT_LEFT_TURN_OFFSET = 0.67212890625;
-
-		// Back left Swerve Module
-		public static final int BACK_LEFT_DRIVE_ID = 31;
-		public static final int BACK_LEFT_TURN_ID = 32;
-		public static final int BACK_LEFT_ENCODER_ID = 33;
-		public static final boolean BACK_LEFT_DRIVE_MOTOR_INVERT = true;
-		public static final double BACK_LEFT_TURN_OFFSET = 0.30982421875;
-
-		// Front Right Swerve Module
-		public static final int FRONT_RIGHT_DRIVE_ID = 24;
-		public static final int FRONT_RIGHT_TURN_ID = 25;
-		public static final int FRONT_RIGHT_ENCODER_ID = 26;
-		public static final boolean FRONT_RIGHT_DRIVE_MOTOR_INVERT = true;
-		public static final double FRONT_RIGHT_TURN_OFFSET = 0.906259765625;
-
-		// Back Right Swerve Module
-		public static final int BACK_RIGHT_DRIVE_ID = 34;
-		public static final int BACK_RIGHT_TURN_ID = 35;
-		public static final int BACK_RIGHT_ENCODER_ID = 36;
-		public static final boolean BACK_RIGHT_DRIVE_MOTOR_INVERT = true;
-		public static final double BACK_RIGHT_TURN_OFFSET = 0.061533203125;
-
-		public static final double DRIVE_P = 1.5;
+		public static final double DRIVE_P = 0;
 		public static final double DRIVE_I = 0;
 		public static final double DRIVE_D = 0;
 		public static final double DRIVE_kS = 0;
 		public static final double DRIVE_kV = 1.85;
 		public static final double DRIVE_kA = 0;
 
-		public static final double TURN_P = 150;
-		public static final double TURN_I = 50;
+		public static final double TURN_P = 125;
+		public static final double TURN_I = 0;
 		public static final double TURN_D = 0.2;
 		public static final double TURN_kS = 0.25;
 		public static final double TURN_kV = 1.5;
@@ -138,7 +118,7 @@ public class Constants {
 		private static final ClosedLoopOutputType steerClosedLoopOutput = ClosedLoopOutputType.Voltage;
 		// The closed-loop output type to use for the drive motors;
 		// This affects the PID/FF gains for the drive motors
-		private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.TorqueCurrentFOC;
+		private static final ClosedLoopOutputType driveClosedLoopOutput = ClosedLoopOutputType.Voltage;
 
 		// The stator current at which the wheels start to slip;
 		// This needs to be tuned to your individual robot
@@ -314,11 +294,11 @@ public class Constants {
 		public static final int TOP_SPEAKER_ROLLER_MOTOR_ID = 10;
 		public static final int BOTTOM_SPEAKER_ROLLER_MOTOR_ID = 11;
 
-		public static final double SPEAKER_SHOOTER_P = 0.5;
+		public static final double SPEAKER_SHOOTER_P = 4;
 		public static final double SPEAKER_SHOOTER_I = 0;
 		public static final double SPEAKER_SHOOTER_D = 0;
 
-		public static final double SPEAKER_SHOOTER_kV = 0;
+		public static final double SPEAKER_SHOOTER_kV = 12 / 98;
 
 		public static final int BEAM_BREAK_PORT = 9;
 	}
@@ -333,9 +313,9 @@ public class Constants {
 		public static final double SOURCE_PIVOT_ANGLE = 45; // off vertical
 		public static final double PIVOT_ANGLE_THRESHOLD = 10; // in degrees
 
-		public static final double PIVOT_P = 25;
+		public static final double PIVOT_P = 29;
 		public static final double PIVOT_I = 0;
-		public static final double PIVOT_D = 3;
+		public static final double PIVOT_D = 0;
 
 		public static final double PIVOT_kS = 0.4;
 		public static final double PIVOT_kG = 0.67;
@@ -379,6 +359,11 @@ public class Constants {
 
 	public static final class VisionConstants {
 
+		public static record CameraParams(
+				String name,
+				Transform3d transforms) {
+		};
+
 		public static final String[] cameraNames = {
 				"FL",
 				"FR",
@@ -399,18 +384,20 @@ public class Constants {
 						Units.inchesToMeters(20.66666666)), new Rotation3d(0, 0, Units.degreesToRadians(180)))
 		};
 
-		public static final double singleTagAmbiguityCutoff = 0.1;
+		public static final List<CameraParams> cameras = List.of(
+				new CameraParams(cameraNames[0], vehicleToCameras[2]),
+				new CameraParams(cameraNames[3], vehicleToCameras[3]));
 
-		// 0.45 from 2023
-		public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(0.8, 0.8, 1);
-		// 1.2 from 2023
-		public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(2.2, 2.2, 5);
-		public static final Matrix<N3, N1> singleTagUncertainty = VecBuilder.fill(25.0, 25.0, 5);
+		public static final double lowUncertaintyCutoffDistance = 6.5;
+		public static final double skewCutoffDistance = 5.8;
+		public static final double skewCutoffRotation = Units.degreesToRadians(50);
 
+		public static final Matrix<N3, N1> teleopCameraUncertainty = VecBuilder.fill(2, 2, 2);
+		public static final Matrix<N3, N1> lowCameraUncertainty = VecBuilder.fill(8, 8, 8);
+		public static final Matrix<N3, N1> highCameraUncertainty = VecBuilder.fill(16.0, 16.0, 16);
 		public static final Matrix<N3, N1> driveUncertainty = VecBuilder.fill(0.1, 0.1, 0.1);
 
-		public static final double midfieldLowThresholdM = 5.87;
-		public static final double midfieldHighThresholdM = 10.72;
+		public static final AprilTagFieldLayout tagLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
 	}
 }

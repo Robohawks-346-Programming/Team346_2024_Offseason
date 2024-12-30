@@ -78,7 +78,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 			startSimThread();
 		}
 
-		configurePathPlanner();
 		setBrakeMode();
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
@@ -90,7 +89,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 			startSimThread();
 		}
 
-		configurePathPlanner();
 		setBrakeMode();
 		CommandScheduler.getInstance().registerSubsystem(this);
 	}
@@ -137,10 +135,6 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
 		autoChooser = AutoBuilder.buildAutoChooser();
 		SmartDashboard.putData("Auto Chooser", autoChooser);
-
-		PathPlannerPath traj1 = PathPlannerPath.fromChoreoTrajectory("StageTestBot");
-		PathPlannerPath traj2 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.1");
-		PathPlannerPath traj3 = PathPlannerPath.fromChoreoTrajectory("StageTestBot.2");
 	}
 
 	public Command getAutoCommand() {
@@ -174,7 +168,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 					.setNeutralMode(NeutralModeValue.Brake);
 			this.getModule(i)
 					.getSteerMotor()
-					.setNeutralMode(NeutralModeValue.Coast);
+					.setNeutralMode(NeutralModeValue.Brake);
 		}
 	}
 

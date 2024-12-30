@@ -3,7 +3,7 @@ The purpose of this repo is to test new software with the existing 2024 comp rob
 
 ## Planned Changes
 - [x] Autoformat
-- [ ] Advantage Kit
+- [X] Advantage Kit
 - [x] CTRE Swerve Generator
 - [x] Updated Commands trees
 - [x] Better Kalman Filters for vision

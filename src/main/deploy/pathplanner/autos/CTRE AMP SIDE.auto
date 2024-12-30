@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.7474133372306824,
-      "y": 6.707301616668701
-    },
-    "rotation": 57.724377197011684
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -48,12 +41,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "Amp Side.4"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Distance Shoot 2"
@@ -62,6 +49,7 @@
       ]
     }
   },
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": true
 }

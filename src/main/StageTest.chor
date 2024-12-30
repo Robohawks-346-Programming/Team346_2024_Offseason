@@ -4194,7 +4194,7 @@
                     }
                 }
             ],
-            "isTrajectoryStale": false
+            "isTrajectoryStale": true
         },
         "6 note": {
             "waypoints": [
