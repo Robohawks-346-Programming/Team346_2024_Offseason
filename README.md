@@ -19,10 +19,10 @@ The purpose of this repo is to test new software with the existing 2024 comp rob
 - Automatic distance based shooting based off of pose determined by fiducial tracking
 
 ## AI Game Piece Detection
-https://github.com/Robohawks-346-Programming/Team346_2024_Offseason/blob/master/AI%20Note%20Tracking%20(1)%20(1)%20(1).mp4
+https://github.com/user-attachments/assets/f61318d6-b2fd-4a13-a274-39e5f386329a
 
 ## Fiducial-based Distance Shooting
-https://github.com/Robohawks-346-Programming/Team346_2024_Offseason/blob/master/Fiducial-based%20Distance%20Shooting%20(1)%20(1)%20(1).mp4
+https://github.com/user-attachments/assets/6f8c3180-7268-4ef0-b97a-91d17584ffd3
 
 ## Automatic Formatting with `spotless`
 
