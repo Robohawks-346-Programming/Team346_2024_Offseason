@@ -1,13 +1,28 @@
-# Offseason Robot Code
+# 2024 Offseason Robot Code
 The purpose of this repo is to test new software with the existing 2024 comp robot, Khaos. The reason for creating a new repo and not branch is because the entire code will be revamped and it is cleaner to start fresh.
 
-## Planned Changes
+## Changes Made
 - [x] Autoformat
 - [X] Advantage Kit
 - [x] CTRE Swerve Generator
 - [x] Updated Commands trees
 - [x] Better Kalman Filters for vision
 - [x] Driver Automation regarding shooting
+
+## Software Features of the Robot
+- Around 70% of robot functions automated (Operator role eliminated, only 1 driver required)
+- Robot knows where it is on the field through vision system for tracking fiducials on the field and updating odometry
+- Swerve Drive 250hz odometry for fast sensor fusion and update rates
+- Computer vision uses an AI Yolo v8 model to track game pieces and automatically drive and intake them without human intervention
+- Subsystems are all replay and physics simulation compatible through hardware abstraction
+- Logging almost every hardware to debug issues easily
+- Automatic distance based shooting based off of pose determined by fiducial tracking
+
+## AI Game Piece Detection
+https://github.com/Robohawks-346-Programming/Team346_2024_Offseason/blob/master/AI%20Note%20Tracking%20(1)%20(1)%20(1).mp4
+
+## Fiducial-based Distance Shooting
+https://github.com/Robohawks-346-Programming/Team346_2024_Offseason/blob/master/Fiducial-based%20Distance%20Shooting%20(1)%20(1)%20(1).mp4
 
 ## Automatic Formatting with `spotless`
 
