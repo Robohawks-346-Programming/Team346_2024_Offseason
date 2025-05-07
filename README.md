@@ -16,6 +16,7 @@ The purpose of this repo is to test new software with the existing 2024 comp rob
 - Computer vision uses an AI Yolo v8 model to track game pieces and automatically drive and intake them without human intervention
 - Subsystems are all replay and physics simulation compatible through hardware abstraction
 - Logging almost every hardware to debug issues easily
+- Commands involving individual subsystems converted to state machines
 - Automatic distance based shooting based off of pose determined by fiducial tracking
 
 ## AI Game Piece Detection
